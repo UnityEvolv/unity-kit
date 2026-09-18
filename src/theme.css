@@ -1,0 +1,18 @@
+/*
+ * unitykit theme.
+ *
+ * Deliberately does NOT `@import "tailwindcss"` — the consuming app does that once.
+ * Importing it here too would pull a second copy of Tailwind into every consumer.
+ *
+ * Consuming apps use it like this:
+ *
+ *   @import "tailwindcss";
+ *   @import "unitykit/theme.css";
+ *   @source "../node_modules/unitykit/dist";
+ */
+
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+/* Brand token overrides land here in UKIT-3. */
