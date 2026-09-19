@@ -22,12 +22,12 @@ Three lines in your app's CSS entry point, then import components normally.
 
 ```css
 @import "tailwindcss";
-@import "unitykit/theme.css";
-@source "../node_modules/unitykit/dist";
+@import "@unityevolv/unitykit/theme.css";
+@source "../node_modules/@unityevolv/unitykit/dist";
 ```
 
 ```tsx
-import { Button } from 'unitykit'
+import { Button } from '@unityevolv/unitykit'
 
 export function Example() {
   return <Button variant="primary">Save</Button>

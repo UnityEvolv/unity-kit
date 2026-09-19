@@ -54,8 +54,8 @@ app using the kit needs all three lines:
 
 ```css
 @import "tailwindcss";
-@import "unitykit/theme.css";
-@source "../node_modules/unitykit/dist";
+@import "@unityevolv/unitykit/theme.css";
+@source "../node_modules/@unityevolv/unitykit/dist";
 ```
 
 **3. Every runtime import must be declared** in `dependencies` or `peerDependencies`.

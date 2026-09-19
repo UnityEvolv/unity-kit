@@ -110,12 +110,12 @@ export default defineConfig({
   // silently produces no CSS, which is one of the two failures under test.
   writeFileSync(
     join(app, 'src', 'index.css'),
-    `@import "tailwindcss";\n@import "unitykit/theme.css";\n@source "../node_modules/unitykit/dist";\n`,
+    `@import "tailwindcss";\n@import "@unityevolv/unitykit/theme.css";\n@source "../node_modules/@unityevolv/unitykit/dist";\n`,
   )
 
   writeFileSync(
     join(app, 'src', 'components.js'),
-    `import * as kit from 'unitykit'
+    `import * as kit from '@unityevolv/unitykit'
 
 const isComponent = (value) =>
   typeof value === 'function' ||

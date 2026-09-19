@@ -7,8 +7,8 @@
  * Consuming apps use it like this:
  *
  *   @import "tailwindcss";
- *   @import "unitykit/theme.css";
- *   @source "../node_modules/unitykit/dist";
+ *   @import "@unityevolv/unitykit/theme.css";
+ *   @source "../node_modules/@unityevolv/unitykit/dist";
  */
 
 @plugin "daisyui" {

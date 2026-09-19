@@ -1,8 +1,11 @@
 {
-  "name": "unitykit",
+  "name": "@unityevolv/unitykit",
   "version": "0.0.0",
   "description": "Shared React component library built on Tailwind CSS v4 and daisyUI 5.",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "sideEffects": false,
   "repository": {
