@@ -153,14 +153,34 @@ union is what keeps that true.
 from the text around it and every theme and token works without the icon knowing they
 exist. Colour a parent, not the icon.
 
-### Labelling
+### Icons in components
 
-An icon is decorative by default: `aria-hidden`, and out of the tab order. An icon-only
-button takes its name from the button, so giving the icon a `title` as well makes a screen
-reader announce the same thing twice.
+Components take an icon as a **prop**, not as a child. The component picks the size, the
+placement and the shape, so a caller never writes a daisyUI class name or guesses at
+pixel sizes:
 
 ```tsx
-<button aria-label="Mute microphone"><Icon name="mic-off" size="sm" /></button>
+<Button icon="invite">Invite</Button>
+<Button icon="chevron-right" iconPosition="end">Next</Button>
+<Button icon="trash" variant="danger" aria-label="Delete" />   // icon-only
+```
+
+An icon-only button with no accessible name **does not compile**. The icon is
+`aria-hidden`, so the button would have nothing to announce; the type requires
+`aria-label` on that shape:
+
+```tsx
+<Button icon="trash" />   // Property 'aria-label' is missing
+```
+
+### Labelling
+
+An icon is decorative by default: `aria-hidden`, and out of the tab order. A button takes
+its name from its own label, so giving the icon a `title` as well makes a screen reader
+announce the same thing twice. Reach for `title` only when an icon stands alone and
+carries meaning:
+
+```tsx
 <Icon name="record" title="Recording" />   // standalone and meaningful
 ```
 
