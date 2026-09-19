@@ -10,7 +10,7 @@
 export type ThemeName = 'light' | 'dark'
 
 /** Every colour token, in both themes. */
-export type ColorToken = 'bg' | 'surface' | 'surface-raised' | 'line' | 'ink' | 'muted' | 'primary' | 'primary-hover' | 'primary-ink' | 'secondary' | 'secondary-hover' | 'secondary-ink' | 'danger' | 'danger-hover' | 'danger-ink' | 'status-ink' | 'ok' | 'warn' | 'info' | 'focus'
+export type ColorToken = 'bg' | 'surface' | 'surface-raised' | 'line' | 'ink' | 'muted' | 'primary' | 'primary-hover' | 'primary-ink' | 'secondary' | 'secondary-hover' | 'secondary-ink' | 'danger' | 'danger-hover' | 'danger-ink' | 'status-ink' | 'ok' | 'warn' | 'info' | 'focus' | 'avatar-1' | 'avatar-2' | 'avatar-3' | 'avatar-4' | 'avatar-5' | 'avatar-6' | 'avatar-ink-vivid' | 'avatar-ink-muted'
 
 /**
  * The brand palette as literal hex strings, for anything that cannot use a CSS
@@ -39,6 +39,14 @@ export const tokens: Record<ThemeName, Record<ColorToken, string>> = {
     warn: '#966319',
     info: '#0C798A',
     focus: '#7A3FD666',
+    'avatar-1': '#7A3FD6',
+    'avatar-2': '#DCC6FA',
+    'avatar-3': '#2D62A5',
+    'avatar-4': '#AFCCF5',
+    'avatar-5': '#0C798A',
+    'avatar-6': '#93D4DE',
+    'avatar-ink-vivid': '#FFFFFF',
+    'avatar-ink-muted': '#1B1A1F',
   },
   dark: {
     bg: '#121212',
@@ -61,6 +69,14 @@ export const tokens: Record<ThemeName, Record<ColorToken, string>> = {
     warn: '#F2B84B',
     info: '#25E0F8',
     focus: '#C27FFF66',
+    'avatar-1': '#C27FFF',
+    'avatar-2': '#5B2E99',
+    'avatar-3': '#6FB4FF',
+    'avatar-4': '#23508C',
+    'avatar-5': '#25E0F8',
+    'avatar-6': '#10646F',
+    'avatar-ink-vivid': '#121212',
+    'avatar-ink-muted': '#FFFFFF',
   },
 }
 
@@ -130,6 +146,12 @@ export const contrastPairs: ReadonlyArray<readonly [ColorToken, ColorToken]> = [
   ['secondary-ink', 'secondary-hover'],
   ['danger-ink', 'danger'],
   ['danger-ink', 'danger-hover'],
+  ['avatar-ink-vivid', 'avatar-1'],
+  ['avatar-ink-muted', 'avatar-2'],
+  ['avatar-ink-vivid', 'avatar-3'],
+  ['avatar-ink-muted', 'avatar-4'],
+  ['avatar-ink-vivid', 'avatar-5'],
+  ['avatar-ink-muted', 'avatar-6'],
   ['status-ink', 'ok'],
   ['status-ink', 'warn'],
   ['status-ink', 'info'],

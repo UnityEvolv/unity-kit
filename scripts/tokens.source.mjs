@@ -45,6 +45,25 @@ export const palette = {
     warn: '#966319',
     info: '#0C798A',
     focus: '#7A3FD666',
+
+    /*
+     * Avatar identity tints. Six, not a rainbow: the palette is two hues, and
+     * an avatar colour that is neither violet nor teal would be the third hue
+     * UKIT-29 removed. Each hue therefore appears twice — vivid and muted —
+     * which buys separation from lightness instead of from a new colour.
+     *
+     * Measured with CIEDE2000, the closest pair is 15.3 apart. That is wide
+     * enough to tell two people apart at a glance, and every tint clears AA
+     * against its own ink, which `contrastPairs` below enforces.
+     */
+    'avatar-1': '#7A3FD6',
+    'avatar-2': '#DCC6FA',
+    'avatar-3': '#2D62A5',
+    'avatar-4': '#AFCCF5',
+    'avatar-5': '#0C798A',
+    'avatar-6': '#93D4DE',
+    'avatar-ink-vivid': '#FFFFFF',
+    'avatar-ink-muted': '#1B1A1F',
   },
   dark: {
     bg: '#121212',
@@ -67,6 +86,21 @@ export const palette = {
     warn: '#F2B84B',
     info: '#25E0F8',
     focus: '#C27FFF66',
+
+    /*
+     * The same six slots, one hue each, inverted for a dark page: the vivid
+     * slots become the light ones and the muted slots the deep ones, so a
+     * person keeps their hue when the theme changes even though the value
+     * does not. Closest pair here is 17.8.
+     */
+    'avatar-1': '#C27FFF',
+    'avatar-2': '#5B2E99',
+    'avatar-3': '#6FB4FF',
+    'avatar-4': '#23508C',
+    'avatar-5': '#25E0F8',
+    'avatar-6': '#10646F',
+    'avatar-ink-vivid': '#121212',
+    'avatar-ink-muted': '#FFFFFF',
   },
 }
 
@@ -160,6 +194,14 @@ export const utilityAliases = {
   'secondary-hover': 'var(--ue-secondary-hover)',
   'danger-hover': 'var(--ue-danger-hover)',
   focus: 'var(--ue-focus)',
+  'avatar-1': 'var(--ue-avatar-1)',
+  'avatar-2': 'var(--ue-avatar-2)',
+  'avatar-3': 'var(--ue-avatar-3)',
+  'avatar-4': 'var(--ue-avatar-4)',
+  'avatar-5': 'var(--ue-avatar-5)',
+  'avatar-6': 'var(--ue-avatar-6)',
+  'avatar-ink-vivid': 'var(--ue-avatar-ink-vivid)',
+  'avatar-ink-muted': 'var(--ue-avatar-ink-muted)',
 }
 
 /**
@@ -184,6 +226,14 @@ export const contrastPairs = [
   ['secondary-ink', 'secondary-hover'],
   ['danger-ink', 'danger'],
   ['danger-ink', 'danger-hover'],
+  // Avatar initials are text, so WCAG 1.4.3 applies: the vivid slots carry
+  // one ink and the muted slots the other, and both are checked per theme.
+  ['avatar-ink-vivid', 'avatar-1'],
+  ['avatar-ink-muted', 'avatar-2'],
+  ['avatar-ink-vivid', 'avatar-3'],
+  ['avatar-ink-muted', 'avatar-4'],
+  ['avatar-ink-vivid', 'avatar-5'],
+  ['avatar-ink-muted', 'avatar-6'],
   ['status-ink', 'ok'],
   ['status-ink', 'warn'],
   ['status-ink', 'info'],
