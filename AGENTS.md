@@ -42,7 +42,12 @@ assembled from a variable is invisible to it and produces no CSS.
 variantClass[variant]     // works: the full name appears in the built file
 ```
 
-Keep every class name written out in full, in a lookup object or a CVA config.
+Keep every class name written out in full, in a lookup object or a CVA config. `npm run
+lint` enforces this: a template literal inside a `className` is an error.
+
+Note that the blind install test does not catch this one. daisyUI emits its modifier rules
+whenever the base component class is present, so `.btn-primary` is in the compiled CSS
+whether or not anything references the name statically. Lint is the only guard.
 
 **2. Consuming apps need the `@source` line.** Tailwind does not scan `node_modules`. Any
 app using the kit needs all three lines:

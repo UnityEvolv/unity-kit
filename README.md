@@ -1,5 +1,7 @@
 # unitykit
 
+[![CI](https://github.com/UnityEvolv/unity-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/UnityEvolv/unity-kit/actions/workflows/ci.yml)
+
 Shared React component library for UnityEvolv, built on Tailwind CSS v4 and daisyUI 5.
 
 The kit has no knowledge of any consuming application. It ships components, a theme and
@@ -83,18 +85,26 @@ React duplication at all. `dedupe` prevents it.
 
 ## Blind install test
 
-Run this before every publish. It is the only check that catches both of the failures
-that do not show up on the author's machine.
+`npm run blind-test` runs automatically on every pull request. It packs the kit and
+installs the tarball into a throwaway Vite React app in a temporary directory, with no
+link back to this checkout — a tarball install is the honest test, because `npm link` and
+workspace installs both resolve packages the kit never declared.
 
-1. On a clean machine or container, with no link and no cached `node_modules`, scaffold a
-   throwaway Vite React app
-2. `npm install github:UnityEvolv/unity-kit#main`
-3. Add the three CSS lines above
-4. Render one `Button`
+It renders every exported component, collects the class names they emit, and requires each
+one to resolve to a non-empty rule in the app's compiled CSS. New components are covered
+automatically, with no per-component setup.
 
-It passes only if the Button renders **styled**. A styled Button proves Tailwind scanned
-the kit's `dist/`, and proves the kit declared every package it imports at runtime — npm's
-flat `node_modules` hides undeclared dependencies locally but not in a clean install.
+That fails the build on:
+
+- **an undeclared runtime dependency** — npm's flat `node_modules` resolves these locally
+  and then fails for consumers on a clean install
+- **a missing `@source` line**, which stops Tailwind scanning the kit entirely
+
+It does *not* catch a class name assembled from a variable; daisyUI emits its modifier
+rules whenever the base component class is present, so the CSS exists either way. `npm run
+lint` guards that instead.
+
+Use `npm run blind-test -- --keep` to leave the generated app in place for inspection.
 
 ## Scripts
 
@@ -102,7 +112,10 @@ flat `node_modules` hides undeclared dependencies locally but not in a clean ins
 | --- | --- |
 | `npm run build` | Build `dist/` — ESM bundle, `.d.ts` declarations, `theme.css` |
 | `npm run dev` | Same, in watch mode |
+| `npm run lint` | ESLint, including the static-class-name rule |
 | `npm run typecheck` | `tsc --noEmit` |
+| `npm run test` | Vitest unit tests |
+| `npm run blind-test` | Pack and install into a throwaway app (see above) |
 
 ## Contributing
 

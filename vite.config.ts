@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { copyFileSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
@@ -31,5 +32,11 @@ export default defineConfig({
       external: ['react', 'react-dom', 'react/jsx-runtime'],
     },
     sourcemap: true,
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./vitest.setup.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
   },
 })
