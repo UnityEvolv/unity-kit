@@ -196,6 +196,39 @@ one is a row and nothing else.
 - `ofiskit` shares the UO mark with `unityofis` on purpose: the engine carries the
   product's mark rather than earning a third one.
 
+## Loading and empty states
+
+`Spinner`, `Skeleton`, `Progress` and `EmptyState` cover waiting and nothing-here. Reach
+for `Progress` when the extent is known, `Spinner` when it is not, `Skeleton` when the
+shape of the answer is, and `EmptyState` when the wait is over and there is nothing to
+show.
+
+- **A live region is announced by its contents, not its accessible name.** `Spinner` is
+  `role="status"`; that role takes no name from what it contains, and an empty one
+  carrying only an `aria-label` announces nothing in most screen readers. A spinner with
+  no visible label therefore holds `sr-only` text. Any live region added later follows
+  the same rule — put the words inside it.
+- **`Skeleton` is `aria-hidden`, and the container carries `aria-busy`.** Reading grey
+  bars aloud is worse than silence, and the region being filled is the thing that knows
+  what is loading. Do not add a label to a skeleton to "fix" its silence.
+- **Indeterminate is the absence of a value, not a prop.** `Progress` is a native
+  `<progress>`; omitting `value` is what the platform and daisyUI both read as
+  indeterminate. `value={0}` is a bar that has not started, which is a different
+  statement. Out-of-range values are clamped.
+- **`EmptyState` renders its title as a `p` and takes `titleAs` for a level.** Heading
+  level belongs to the page. It is an element name rather than a node because HTML
+  forbids a heading inside a paragraph.
+- **Reduced motion comes from daisyUI**, which already confines both the spinner and the
+  skeleton animations to `prefers-reduced-motion: no-preference`. Do not stack a
+  `motion-reduce:` variant on top. `Spinner.test.tsx` and `Skeleton.test.tsx` read
+  daisyUI's shipped CSS and assert it still holds, because a dependency is satisfying an
+  accessibility promise the kit makes in its own name.
+- **One place knows how a spinner is drawn.** `Button` imports `spinnerClass` from
+  `Spinner` rather than repeating `loading loading-spinner`, and deliberately does not
+  nest the component: the button is already `aria-busy`, and a `role="status"` inside it
+  would announce the same state twice. `spinnerClass` is not exported from the package —
+  it hands out daisyUI class names, which a consumer should never hold.
+
 ## Styling conventions
 
 - Use daisyUI semantic tokens (`bg-primary`, `text-base-content`), never raw Tailwind
