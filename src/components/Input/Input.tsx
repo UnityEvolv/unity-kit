@@ -2,6 +2,7 @@ import { forwardRef } from 'react'
 import { cva } from 'class-variance-authority'
 import type { InputHTMLAttributes } from 'react'
 import { Field } from '../Field'
+import type { WithSampleProps } from '../sampleProps'
 import type { FieldProps } from '../Field'
 
 /**
@@ -19,7 +20,7 @@ const input = cva('input w-full', {
 })
 
 export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'>,
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'children'>,
     Pick<FieldProps, 'label' | 'help' | 'error' | 'size'> {}
 
 /**
@@ -63,4 +64,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       )}
     </Field>
   )
-})
+}) as WithSampleProps<InputProps, HTMLInputElement>
+
+/**
+ * One valid set of props for the blind install test, which renders every
+ * export with no knowledge of their types. Declaring it also stops the test
+ * passing children, which a control like this cannot take.
+ */
+Input.sampleProps = { label: 'Label' }

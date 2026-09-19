@@ -206,6 +206,48 @@ alert.
   a region's content and may need a heading, an alert is a notice inside a region that
   already has one. Adding a prop nobody needs is worse than the inconsistency.
 
+## Form primitives
+
+Every control renders through `Field`. Nothing in the kit draws its own label.
+
+- **`error` is one prop that does four things**: shows the message, points
+  `aria-describedby` at it, sets `aria-invalid`, and picks the `-error` class. The class
+  is taken from the wiring — `control['aria-invalid'] === true` — rather than recomputed,
+  so a red border without `aria-invalid` is not expressible.
+- **Help stays visible under an error.** Help is the rule, the error is the breach, and
+  hiding the rule when it is broken is backwards. Both go into `aria-describedby`.
+- **Required is the attribute, not the asterisk.** The marker is `aria-hidden`, and a test
+  asserts the accessible name is still "Email" rather than "Email star". Note that
+  `getByLabelText` matches raw text and disagrees; assert `toHaveAccessibleName`.
+- **`Field` takes a function child.** That is how a control the kit does not ship gets the
+  same wiring, and it is why `Field` needs no context and no `cloneElement`.
+- **A group of controls needs `as="fieldset"`.** A legend is the only thing that names a
+  set of radios; without it a screen reader reads options and never says what they are
+  options for. A disabled fieldset disables its contents natively, so the control is not
+  also given `disabled` — the browser already did it.
+- **`Radio` requires `name`.** A radio without one is not a choice, it is a checkbox that
+  cannot be unchecked. The type asks rather than letting it be forgotten.
+- **`Toggle` is a checkbox, not `role="switch"`.** Same keyboard behaviour, same form
+  value, same announcement; only the drawing differs. Use it where the change applies
+  immediately, and `Checkbox` where the answer is submitted with a form.
+- **A `Select` placeholder needs an empty starting value, not just `disabled`.** The
+  browser skips disabled options when choosing the initial selection, so a disabled
+  placeholder alone is never the one showing and the user silently answers a question they
+  never saw. `Select` sets `defaultValue=""` when a placeholder is given and the caller has
+  set neither `value` nor `defaultValue`.
+- **Sizes resolve to the theme's units.** `--size-field` for inputs, selects and
+  textareas; `--size-selector` for the checkbox family. Both are stated in the generated
+  theme now, so control heights come from the brand rather than from daisyUI's fallback.
+  Do not set a height on a control.
+- **daisyUI 5 has no `input-bordered`.** The border is on `.input` itself. The old
+  modifier compiles to nothing and fails silently, which is exactly the class of bug the
+  static-class rule exists for.
+- **Declaring `sampleProps` also opts out of children.** The blind install test passes the
+  component name as children so a component that needs content has some; a form control
+  cannot take children, and React throws when they reach a void element. Use
+  `WithSampleProps` from `src/components/sampleProps.ts` to type a `forwardRef` component
+  that carries the static.
+
 ## Brand
 
 `Brand` renders a product's identity: the monogram, then the name split across the
