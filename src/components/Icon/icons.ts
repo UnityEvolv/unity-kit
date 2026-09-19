@@ -22,6 +22,7 @@ import {
   Mic,
   MicOff,
   Minimize,
+  Minus,
   MonitorUp,
   Pencil,
   PhoneOff,
@@ -30,6 +31,8 @@ import {
   Settings,
   Smile,
   Trash2,
+  TrendingDown,
+  TrendingUp,
   TriangleAlert,
   Unlock,
   Upload,
@@ -108,6 +111,13 @@ export const iconComponents = {
   upload: Upload,
   copy: Copy,
   'external-link': ExternalLink,
+
+  // Metric direction, for a Stat delta. Named for the job rather than the
+  // drawing: `trend-flat` is Lucide’s Minus, which reads as "no change" beside
+  // a number rather than as a subtraction.
+  'trend-up': TrendingUp,
+  'trend-down': TrendingDown,
+  'trend-flat': Minus,
 
   // Drawn for this product; see customIcons.tsx for why each exists
   knock: Knock,
