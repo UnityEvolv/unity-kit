@@ -1,5 +1,7 @@
 import { forwardRef } from 'react'
-import type { ButtonHTMLAttributes } from 'react'
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { Icon } from '../Icon'
+import type { IconName } from '../Icon'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger'
 
@@ -26,24 +28,72 @@ const variantClass: Record<ButtonVariant, string> = {
   danger: 'btn-error hover:bg-danger-hover',
 }
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonBase extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Brand variant. Typed variants arrive with CVA in UKIT-5. */
   variant?: ButtonVariant
+  /** An icon name from the kit. The button sizes and places it. */
+  icon?: IconName
+  /** Which side of the label the icon sits on. Ignored without a label. */
+  iconPosition?: 'start' | 'end'
 }
+
+/**
+ * Two shapes, so an icon-only button cannot ship without an accessible name.
+ *
+ * The icon is `aria-hidden` by design, so a button with an icon and no label
+ * has nothing to announce. Making `aria-label` required on that branch turns
+ * `<Button icon="trash" />` into a compile error rather than a button a screen
+ * reader reads as "button".
+ */
+type LabelledButton = ButtonBase & { children: ReactNode }
+type IconOnlyButton = ButtonBase & {
+  icon: IconName
+  children?: undefined
+  'aria-label': string
+}
+
+export type ButtonProps = LabelledButton | IconOnlyButton
 
 /**
  * Throwaway Button used to verify that a consuming app renders kit components
  * *and* styles them. Replaced by the real CVA-based Button in UKIT-5.
+ *
+ * The icon is a prop rather than a child on purpose. UKIT-5 requires that
+ * consumers never write daisyUI class names directly, and composing an
+ * icon-only button needs `btn-square` at the call site. Taking the icon as a
+ * prop keeps that name inside the kit, and lets the button choose the icon
+ * size rather than leaving every caller to guess it.
  */
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', className, type = 'button', ...props }, ref) => (
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    variant = 'primary',
+    icon,
+    iconPosition = 'start',
+    className,
+    type = 'button',
+    children,
+    ...props
+  },
+  ref,
+) {
+  const iconOnly = icon !== undefined && children === undefined
+
+  // `sm` is 16px, which is the match for the button's 14px label. UKIT-5
+  // derives this from the button's own size prop; there is only one size here.
+  const glyph = icon ? <Icon name={icon} size="sm" /> : null
+
+  return (
     <button
       ref={ref}
       type={type}
-      className={['btn', variantClass[variant], className].filter(Boolean).join(' ')}
+      className={['btn', variantClass[variant], iconOnly ? 'btn-square' : null, className]
+        .filter(Boolean)
+        .join(' ')}
       {...props}
-    />
-  ),
-)
-
-Button.displayName = 'Button'
+    >
+      {iconPosition === 'start' ? glyph : null}
+      {children}
+      {iconPosition === 'end' ? glyph : null}
+    </button>
+  )
+})

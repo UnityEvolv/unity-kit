@@ -139,6 +139,16 @@ one table instead of every call site.
   round caps and joins. Put them in `customIcons.tsx` with a comment saying why Lucide's
   equivalent did not work — the tests assert the geometry, but not the reason.
 - Never ship an emoji as an icon.
+- **A component that shows an icon takes it as a prop, not as a child.** `<Button
+  icon="invite">Invite</Button>`, not `<Button><Icon name="invite" /></Button>`. Composition
+  works — daisyUI's `.btn` is already a flex row with a gap — but it pushes decisions onto
+  the caller that the kit should own: which icon size pairs with which text size, and
+  `btn-square` for the icon-only case, which is a daisyUI class name a consumer must never
+  have to write.
+- **An icon-only control must not compile without an accessible name.** The icon is
+  `aria-hidden`, so there is nothing left to announce. Use two prop shapes — one requiring
+  `children`, one requiring `icon` and `aria-label` — rather than a runtime warning nobody
+  reads. `Button` is the worked example.
 
 A component with a required prop must declare `sampleProps`, because the blind install
 test renders every export blind:
