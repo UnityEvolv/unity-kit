@@ -250,6 +250,61 @@ size, which is the fastest way to spot one that does not.
 Nothing ships with an emoji as an icon. Emoji render differently on every platform and
 cannot take a colour.
 
+## Alerts and banners
+
+A message that belongs on the page — a warning that stays put, an explanation of why a
+form is locked, a notice across the top of an app. Not a toast: `Toast` (UKIT-8) is for
+transient feedback about something that already happened, and it is gone before anyone
+scrolls back.
+
+```tsx
+import { Alert, Button } from '@unityevolv/unitykit'
+
+<Alert variant="warn" title="Storage almost full">
+  Recordings older than 30 days will be removed to make room.
+</Alert>
+
+<Alert variant="danger" action={<Button size="sm" variant="danger">Retry</Button>} onDismiss={hide}>
+  Could not join the office.
+</Alert>
+
+<Alert banner variant="info">Scheduled maintenance tonight from 22:00 UTC.</Alert>
+```
+
+Variants are the kit's names — `info`, `ok`, `warn`, `danger` — the same four `Progress`
+uses. daisyUI spells two of them differently (`alert-success`, `alert-error`); that
+translation lives in the component and nowhere else.
+
+### Warnings interrupt, confirmations wait
+
+`warn` and `danger` render `role="alert"`, which is assertive: it cuts across whatever a
+screen reader is saying. `info` and `ok` render `role="status"`, which waits for a pause.
+The difference is the whole point of the distinction — a failure that has to be dealt
+with now should interrupt, and a note that something saved should not. Pass `role`
+explicitly to override it.
+
+### Every variant draws its own glyph
+
+WCAG 1.4.1: colour alone cannot carry a difference. A red triangle beside an amber
+triangle is one picture in two colours, so `danger` uses a circled exclamation and `warn`
+keeps the triangle. This is why the icon table gained an `error` row — `alert` was
+already the warning triangle, and the two states needed different drawings. Set `icon` to
+use another, or `showIcon={false}` to drop it.
+
+### The kit does not remember dismissals
+
+`onDismiss` fires and nothing else happens. The alert does not remove itself, because
+whether a notice should come back on the next page load, next session or never is a
+product decision the kit cannot see — and an alert that hides itself is one that cannot
+be brought back without a re-render the app did not ask for. Keep the state in the app.
+
+### Banner
+
+`banner` makes it full width with square corners and no side or top border, for a notice
+pinned to the edge of a page rather than floating on it as a card. It is a prop rather
+than a second component, because a `Banner` would be an `Alert` with two class names
+changed, and two names for one thing drift apart.
+
 ## Brand
 
 A product's identity — the monogram, then the product name in two tones, the way
