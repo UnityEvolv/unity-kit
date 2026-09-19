@@ -86,6 +86,14 @@ export const scales = {
     '3xl': ['1.875rem', '2.25rem'],
   },
   radius: { sm: '4px', md: '6px', lg: '8px', xl: '12px', full: '999px' },
+  /*
+   * The two units every daisyUI control is measured in. `field` scales inputs,
+   * selects and textareas; `selector` scales checkboxes, radios and toggles.
+   * daisyUI falls back to 0.25rem when a theme says nothing, which means the
+   * control heights come from the library rather than from the brand — so the
+   * theme states them, and one edit here moves every control together.
+   */
+  size: { field: '0.25rem', selector: '0.25rem' },
   shadow: {
     sm: '0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 3px 0 rgb(0 0 0 / 0.10)',
     md: '0 4px 6px -1px rgb(0 0 0 / 0.10), 0 2px 4px -2px rgb(0 0 0 / 0.06)',

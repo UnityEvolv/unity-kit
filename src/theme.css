@@ -77,6 +77,8 @@
   --radius-field: 6px;
   --radius-box: 8px;
   --border: 1px;
+  --size-field: 0.25rem;
+  --size-selector: 0.25rem;
 }
 
 @plugin "daisyui/theme" {
@@ -131,6 +133,8 @@
   --radius-field: 6px;
   --radius-box: 8px;
   --border: 1px;
+  --size-field: 0.25rem;
+  --size-selector: 0.25rem;
 }
 
 /*
