@@ -117,6 +117,25 @@ any consumer writing `btn-accent` would get daisyUI's default teal and nothing w
 Highlights that are not actions — a raised hand, an unread mention, a recording indicator —
 use `secondary`.
 
+## Variants: CVA is the convention
+
+Any component with variants follows `src/components/Button/Button.tsx`: one `cva()`
+config holding class names written out in full, prop types derived from that config, and
+a lookup table for anything that has to scale with a variant, such as the icon or spinner
+size. Do not concatenate class strings, and do not add a `className` escape hatch for a
+variant that should be in the config.
+
+- **Derive prop types with `NonNullable<VariantProps<typeof x>['size']>`**, not by
+  extending `VariantProps` directly. That type admits `null` for every variant — CVA's way
+  of spelling "no class" — and a nullable `size` cannot index a lookup table. This costs
+  ten minutes to rediscover every time.
+- **Emit a class for every size, including the default.** `btn-md` exists; leaving the
+  default as an empty string makes the output depend on daisyUI's defaults rather than on
+  this config, and makes a size impossible to assert in a test.
+- **A variant that maps to nothing should not exist.** There is no `accent` button, because
+  daisyUI's accent is aliased to primary and the variant would be a synonym; there is no
+  `link` badge, because daisyUI has no badge equivalent and the name would map to no class.
+
 ## Icons
 
 Every icon goes through `<Icon name="..." />`. `src/components/Icon/icons.ts` is the only

@@ -20,15 +20,18 @@ const meta = {
   argTypes: {
     variant: {
       control: 'inline-radio',
-      options: ['primary', 'secondary', 'danger'],
-      description: 'daisyUI colour variant.',
+      options: ['primary', 'secondary', 'danger', 'ghost', 'link'],
+      description: 'Brand and status colours, plus the two unfilled styles.',
     },
+    size: { control: 'inline-radio', options: ['xs', 'sm', 'md', 'lg'] },
     icon: {
       control: 'select',
       options: [undefined, ...iconNames],
       description: 'An icon name from the kit. The button sizes and places it.',
     },
     iconPosition: { control: 'inline-radio', options: ['start', 'end'] },
+    loading: { control: 'boolean' },
+    fullWidth: { control: 'boolean' },
     disabled: { control: 'boolean' },
   },
   args: { children: 'Save' },
@@ -93,21 +96,59 @@ export const WithIcons: Story = {
   ),
 }
 
+/** Every size, with the icon scaling to match the label rather than the button. */
+export const Sizes: Story = {
+  render: (args) => (
+    <div className="flex flex-wrap items-end gap-3">
+      {(['xs', 'sm', 'md', 'lg'] as const).map((size) => (
+        <Button key={size} {...args} size={size} icon="invite">
+          {size}
+        </Button>
+      ))}
+    </div>
+  ),
+}
+
+/**
+ * The spinner takes the icon's place rather than joining it, so the button
+ * keeps its width. A loading button is disabled and `aria-busy`, which is what
+ * says the state is temporary rather than the control broken.
+ */
+export const Loading: Story = {
+  render: (args) => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button {...args} loading>
+        Saving
+      </Button>
+      <Button {...args} loading variant="secondary" icon="invite">
+        Inviting
+      </Button>
+      <Button {...args} loading variant="danger" size="sm">
+        Deleting
+      </Button>
+      <Button {...args} loading icon="mic" aria-label="Connecting" children={undefined} />
+    </div>
+  ),
+}
+
+export const FullWidth: Story = {
+  args: { fullWidth: true, children: 'Join the office' },
+}
+
 /** Check this one in both themes; it is the fastest way to spot a token regression. */
 export const AllVariants: Story = {
   render: (args) => (
     <div className="flex flex-wrap items-center gap-3">
-      <Button {...args} variant="primary">
-        Primary
-      </Button>
-      <Button {...args} variant="secondary">
-        Secondary
-      </Button>
-      <Button {...args} variant="danger">
-        Danger
-      </Button>
+      {(['primary', 'secondary', 'danger', 'ghost', 'link'] as const).map((variant) => (
+        <Button key={variant} {...args} variant={variant}>
+          {variant}
+        </Button>
+      ))}
       <Button {...args} disabled>
         Disabled
+      </Button>
+      <Button {...args} loading>
+        Loading
       </Button>
     </div>
   ),
