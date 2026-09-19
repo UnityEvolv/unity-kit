@@ -126,6 +126,61 @@ is ΔE 1.7 from `warn`, which is the same colour. daisyUI always emits an accent
 `--color-accent` is aliased to primary and `btn-accent` can never introduce one; a test
 asserts that alias against the generated theme.
 
+## Buttons and badges
+
+Variants are picked from the API. A consumer never writes a daisyUI class name — not for
+the colour, not `btn-square` for an icon-only button, not `btn-block` for full width.
+
+```tsx
+import { Badge, Button } from '@unityevolv/unitykit'
+
+<Button variant="primary" size="lg" icon="invite">Invite</Button>
+<Button variant="danger" icon="trash" aria-label="Delete" />
+<Button loading fullWidth>Joining</Button>
+
+<Badge variant="danger" icon="record">Recording</Badge>
+<Badge size="sm" outline>Draft</Badge>
+```
+
+| | Button | Badge |
+| --- | --- | --- |
+| Colours | `primary` `secondary` `danger` `ghost` `link` | `primary` `secondary` `danger` `ghost` |
+| Sizes | `xs` `sm` `md` `lg` | `xs` `sm` `md` `lg` |
+| Also | `loading`, `fullWidth`, `icon`, `iconPosition` | `outline`, `icon` |
+
+There is no `accent` variant: the palette is two hues plus the status colours, and
+daisyUI's accent is aliased to primary, so it would be a synonym dressed up as a choice.
+Badge has no `link` — that is a button style, a control that looks like text, and daisyUI
+has no badge equivalent.
+
+**Invalid combinations do not compile.** Variants are declared in a
+[class-variance-authority](https://cva.style) config and the prop types are derived from
+it, so a colour or size that does not exist is a type error rather than a class name that
+silently produces no CSS:
+
+```tsx
+<Button variant="accent">Save</Button>   // Type '"accent"' is not assignable
+<Badge size="xl">New</Badge>             // Type '"xl"' is not assignable
+```
+
+An icon-only button with no accessible name does not compile either.
+
+`loading` shows a spinner **in the icon's place** rather than beside it, so the button
+keeps its width and does not shove whatever sits next to it. It also disables the button
+and sets `aria-busy`, which is what tells a screen reader the state is temporary rather
+than the control being unavailable.
+
+### CVA is the pattern for the rest of the library
+
+Every component with variants follows the shape in `src/components/Button/Button.tsx`:
+one `cva()` config holding full class names, prop types derived from it, and a lookup
+table for anything that must scale with a variant, such as the icon size.
+
+One wrinkle worth knowing before copying it: derive props with
+`NonNullable<VariantProps<typeof x>['size']>` rather than extending `VariantProps`
+directly. That type admits `null` for every variant — CVA's way of spelling "no class" —
+and a nullable `size` cannot index a lookup table.
+
 ## Icons
 
 One component, so no app ever imports an icon library directly.
