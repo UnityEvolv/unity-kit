@@ -106,6 +106,22 @@ lint` guards that instead.
 
 Use `npm run blind-test -- --keep` to leave the generated app in place for inspection.
 
+## Storybook
+
+```bash
+npm run storybook        # dev server on :6006
+```
+
+Build components here rather than in a product app. The toolbar switches between the
+light and dark daisyUI themes, so every story can be checked in both — which is the
+fastest way to catch a token that only works in one.
+
+`src/components/Button/Button.stories.tsx` is the template every component follows:
+`Category/Component` title, `autodocs` for the generated props page, one story per
+meaningful state, and an `AllVariants` story that shows them together.
+
+CI builds every story, so a broken story fails the PR.
+
 ## Scripts
 
 | Script | Does |
@@ -116,6 +132,8 @@ Use `npm run blind-test -- --keep` to leave the generated app in place for inspe
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run test` | Vitest unit tests |
 | `npm run blind-test` | Pack and install into a throwaway app (see above) |
+| `npm run storybook` | Storybook dev server on :6006 |
+| `npm run build-storybook` | Static Storybook into `storybook-static/` |
 
 ## Contributing
 
