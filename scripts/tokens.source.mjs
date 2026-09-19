@@ -12,14 +12,14 @@
  * requires an accent, so it is aliased to primary and `btn-accent` never
  * introduces a third colour.
  *
- * One deviation from UKIT-29 as written. Its light `secondary`/`info`
- * (#0E8FA3), `ok` (#2E8B57), `warn` (#B7791F) and `danger` (#C8503F) measure
- * 3.83, 4.25, 3.64 and 4.49 against the light background -- below the AA the
- * story's own "Done when" requires. Each is deepened along its own hue until
- * it clears 4.5:1 with headroom. Dark mode is untouched: every dark pair
- * already passes. If the literal hex values matter more than the AA clause,
- * change them here and record the failing pairs as accepted exceptions in
- * src/contrast.test.ts -- but the two cannot both hold.
+ * These values match UKIT-29. Four of the light ones differ from the story's
+ * first draft: `secondary`/`info` (#0E8FA3), `ok` (#2E8B57), `warn` (#B7791F)
+ * and `danger` (#C8503F) measured 3.83, 4.25, 3.64 and 4.49 against the light
+ * background, below the AA the story also required, so each was deepened along
+ * its own hue until it cleared 4.5:1 with headroom. The story now carries the
+ * deepened values; this note is here so nobody "restores" the originals from
+ * an older draft without noticing they fail. Dark mode was never changed --
+ * every dark pair already passes.
  */
 
 /** Colour tokens, per theme. Every value is a literal hex string. */

@@ -95,13 +95,12 @@ is the easiest one to miss — nobody screenshots it.
 `line` is exempt. WCAG 1.4.11 covers boundaries that carry meaning, and holding a plain
 divider to 3:1 forces it to read as a heavy rule.
 
-Four light-mode values deviate from UKIT-29 as written. The story's `secondary`/`info`,
-`ok`, `warn` and `danger` measure 3.83, 4.25, 3.64 and 4.49 against the light background,
-all below the AA its own "Done when" requires. Each is deepened along its own hue until it
-clears 4.5:1 with headroom. Dark mode uses the brand values unchanged; it already passes
-everywhere. If the literal hex values ever matter more than the AA clause, change them in
-the token source and record the failing pairs as accepted exceptions in the test — but the
-two cannot both hold, so make it a deliberate choice rather than a silent one.
+Four light-mode values differ from UKIT-29's first draft. Its `secondary`/`info`, `ok`,
+`warn` and `danger` measured 3.83, 4.25, 3.64 and 4.49 against the light background, below
+the AA the story also required, so each was deepened along its own hue until it cleared
+4.5:1 with headroom. The story now carries the deepened values, so they are not a
+deviation — but the originals are still in older drafts, and restoring one would fail the
+build rather than pass silently. Dark mode was never changed; it already passes everywhere.
 
 ### There is no third hue
 
