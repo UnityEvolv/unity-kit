@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
+  CircleAlert,
   CircleDot,
   Clock,
   Copy,
@@ -21,6 +22,7 @@ import {
   Mic,
   MicOff,
   Minimize,
+  Minus,
   MonitorUp,
   Pencil,
   PhoneOff,
@@ -29,6 +31,8 @@ import {
   Settings,
   Smile,
   Trash2,
+  TrendingDown,
+  TrendingUp,
   TriangleAlert,
   Unlock,
   Upload,
@@ -91,6 +95,11 @@ export const iconComponents = {
   'chevron-left': ChevronLeft,
   'chevron-right': ChevronRight,
   alert: TriangleAlert,
+  // Named for the state the user is in, not the shape: `alert` is already the
+  // warning triangle, and a failure needs a glyph of its own so a red alert and
+  // an amber one are not the same picture in two colours. WCAG 1.4.1 — colour
+  // alone cannot carry the difference.
+  error: CircleAlert,
   info: Info,
   trash: Trash2,
   edit: Pencil,
@@ -102,6 +111,13 @@ export const iconComponents = {
   upload: Upload,
   copy: Copy,
   'external-link': ExternalLink,
+
+  // Metric direction, for a Stat delta. Named for the job rather than the
+  // drawing: `trend-flat` is Lucide’s Minus, which reads as "no change" beside
+  // a number rather than as a subtraction.
+  'trend-up': TrendingUp,
+  'trend-down': TrendingDown,
+  'trend-flat': Minus,
 
   // Drawn for this product; see customIcons.tsx for why each exists
   knock: Knock,
