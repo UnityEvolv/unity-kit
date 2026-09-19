@@ -298,6 +298,55 @@ phone a row of metrics runs off the edge instead of reflowing. Stacking is daisy
 answer and it is the default here so a dashboard row survives a narrow viewport without
 the consumer thinking about it; `horizontal` and `vertical` pin it.
 
+## Overlays
+
+`Modal`, `Drawer`, `Dropdown`, `Popover` and `Tooltip` are Radix primitives wearing daisyUI
+classes. Radix owns the focus trap, the focus return, Escape, outside-click dismissal, the
+scroll lock and the ARIA roles; daisyUI owns the surface. Never hand-roll any of the first
+list — that is the one place CSS genuinely cannot reach, and it is where component
+libraries most often get accessibility wrong.
+
+**`.modal-box` must be a direct child of `.modal.modal-open`.** daisyUI renders the panel
+at `opacity: 0; scale: .95` until that exact selector matches, so `Dialog.Content` is
+nested *inside* `Dialog.Overlay` rather than placed beside it. Break the nesting and the
+dialog is present, focused and invisible, with nothing in the console to say why. Radix
+mounts the portal only while the dialog is open, so `modal-open` is applied
+unconditionally: being in the DOM already means open, and the class is how daisyUI is told.
+
+**Three daisyUI classes cannot be used with Radix at all**, because each is a second
+open/close mechanism rather than a style:
+
+- `.drawer` is revealed by `.drawer-toggle:checked ~ .drawer-side`, which can never match
+  when Radix decides whether the panel exists. daisyUI's own edge sheet is
+  `modal-start` / `modal-end` / `modal-top` / `modal-bottom`, and that is what `Drawer`
+  uses. `menu` is still right for navigation *inside* a drawer.
+- `.dropdown-content` positions with CSS anchor positioning and opens on `:focus-within`.
+  `Dropdown` uses `menu` on a real `ul`, with every item in an `li` — those are the
+  elements `.menu` styles, and a bare `div` would leave items with no padding, radius or
+  row layout.
+- `.tooltip` renders its text through `content: attr(data-tip)`. Generated content is
+  unreachable by assistive technology, so the class defeats the purpose of the component.
+  `Tooltip` matches its colours with utilities instead.
+
+**Radix state maps to Tailwind data variants, not to daisyUI state classes.**
+`data-[highlighted]:bg-base-200` unifies hover and keyboard focus into the one state Radix
+already tracks; `.menu-focus` cannot be driven from an attribute.
+
+**Sub-components that need Radix context are statics, not exports** — `Modal.Close`,
+`Dropdown.Item`, `Popover.Close`. The blind install test renders every top-level export
+standalone, and anything requiring a provider throws there. `TooltipProvider` is a genuine
+top-level export because it renders fine on its own.
+
+**A trigger prop decides `asChild` per call** (`asChild={isValidElement(trigger)}`). Radix
+throws when `asChild` is handed anything that is not an element, and a string trigger
+should get Radix's own button rather than a crash.
+
+`vitest.setup.ts` stubs `ResizeObserver` and the pointer-capture methods jsdom omits.
+Without them Radix's positioning throws a `TypeError` and an overlay test fails for
+reasons that have nothing to do with the overlay. Those stubs report no geometry on
+purpose: assert behaviour and markup, never where a panel landed on screen.
+
+
 ## Styling conventions
 
 - Use daisyUI semantic tokens (`bg-primary`, `text-base-content`), never raw Tailwind
