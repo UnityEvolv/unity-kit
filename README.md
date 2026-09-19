@@ -288,6 +288,91 @@ rendering `Brand` into one.
 > `src/components/Brand/marks.tsx` when the vector artwork exists; nothing outside that
 > file changes, because `Brand` only ever asks for a mark at a height.
 
+## Waiting and nothing-here states
+
+Four components, and the first decision is which one the screen actually needs.
+
+| The screen is… | Use | Why |
+| --- | --- | --- |
+| busy, and you know how far along | `Progress` | a measurable bar is information a spinner cannot carry |
+| busy, with no measurable extent | `Spinner` | honest about not knowing |
+| busy, and the shape of the answer is known | `Skeleton` | the page does not jump when the answer lands |
+| finished, and there is nothing to show | `EmptyState` | an empty rectangle explains nothing |
+
+```tsx
+import { Spinner, Skeleton, Progress, EmptyState } from '@unityevolv/unitykit'
+
+<Spinner size="sm" />                          // inline, announces "Loading"
+<Spinner block label="Loading rooms" />        // centred in its container
+
+<Skeleton shape="text" lines={3} />
+<Skeleton shape="circle" width={40} />
+<Skeleton shape="rect" height={120} />
+
+<Progress value={40} label="Uploading" showValue />
+<Progress label="Importing" />                 // no value = indeterminate
+
+<EmptyState
+  icon="office"
+  title="No rooms yet"
+  description="Create a room and invite your team to join it."
+  action={<Button icon="plus">New room</Button>}
+/>
+```
+
+### A live region is announced by its contents, not its name
+
+`Spinner` is a `role="status"` region, so a screen reader reads it when it appears —
+which is the part that matters when a page otherwise just stops. That role takes no
+accessible name from what it contains, and an empty region with only an `aria-label`
+announces nothing at all in most screen readers. So a spinner with no visible `label`
+carries the word "Loading" as `sr-only` text: the announcement is real either way, and
+only its visibility changes.
+
+### Skeletons are silent on purpose
+
+`Skeleton` is `aria-hidden`. Three grey bars read aloud are worse than silence — a
+skeleton is the absence of content drawn so the page does not jump. The **region being
+filled** is what carries `aria-busy="true"` while it waits, so the state is announced
+once, by the thing that knows what is loading.
+
+```tsx
+<section aria-busy={loading} aria-label="Rooms">
+  {loading ? <Skeleton shape="text" lines={3} /> : <RoomList rooms={rooms} />}
+</section>
+```
+
+There is one `Skeleton` with three shapes rather than three components, because
+sketching a card is these nested in ordinary layout divs. A `SkeletonCard` would be
+guessing at a card the kit has not shipped, and a `SkeletonAvatar` would be a `Skeleton`
+with a border radius.
+
+### Indeterminate is the absence of a value
+
+`Progress` is a native `<progress>`, so it carries `role="progressbar"` and its value
+semantics without a line of ARIA. **Omitting `value` is what makes it indeterminate**,
+in the platform and in daisyUI's animation alike — there is no `indeterminate` prop,
+because two ways of saying the same thing eventually disagree. `value={0}` stays a bar
+that has not started, which is a different statement. Values outside `0…max` are clamped
+rather than trusted.
+
+### EmptyState does not invent a heading level
+
+The title renders as a `<p>`. Heading level depends on where the panel sits, and a
+component that guessed `h3` would skip levels on half the pages it appeared on. Pass
+`titleAs="h2"` where the panel is a section in its own right. It is an element name
+rather than a node because HTML forbids a heading inside a paragraph, so
+`title={<h2>…</h2>}` would render markup that browsers silently reshape.
+
+### Reduced motion is daisyUI's, and tested as such
+
+Both `.loading` and `.skeleton` already confine their animation to
+`@media (prefers-reduced-motion: no-preference)` — the skeleton goes flat and the
+spinner drops to a quarter speed. Neither component stacks a `motion-reduce:` variant on
+top. Since a dependency is satisfying one of the kit's accessibility promises, the tests
+read daisyUI's own CSS and assert it still does, so an upgrade that dropped it fails the
+build instead of quietly shipping a strobe.
+
 ## Local development
 
 ```bash
