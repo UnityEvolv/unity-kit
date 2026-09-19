@@ -42,7 +42,8 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "daisyui": "^5.0.0"
+    "daisyui": "^5.0.0",
+    "lucide-react": "^1.47.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
