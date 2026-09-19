@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
+  CircleAlert,
   CircleDot,
   Clock,
   Copy,
@@ -91,6 +92,11 @@ export const iconComponents = {
   'chevron-left': ChevronLeft,
   'chevron-right': ChevronRight,
   alert: TriangleAlert,
+  // Named for the state the user is in, not the shape: `alert` is already the
+  // warning triangle, and a failure needs a glyph of its own so a red alert and
+  // an amber one are not the same picture in two colours. WCAG 1.4.1 — colour
+  // alone cannot carry the difference.
+  error: CircleAlert,
   info: Info,
   trash: Trash2,
   edit: Pencil,

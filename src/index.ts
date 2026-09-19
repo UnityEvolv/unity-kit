@@ -4,6 +4,9 @@ export type { ButtonProps, ButtonVariant, ButtonSize } from './components/Button
 export { Badge } from './components/Badge'
 export type { BadgeProps, BadgeVariant, BadgeSize } from './components/Badge'
 
+export { Alert } from './components/Alert'
+export type { AlertProps, AlertVariant } from './components/Alert'
+
 export { Brand, UEMark, UOMark } from './components/Brand'
 export type { BrandProps, BrandProduct, BrandSize, MarkProps } from './components/Brand'
 

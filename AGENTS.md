@@ -180,6 +180,32 @@ Leave it off and the test fails by name asking for it. It does not skip the comp
 because skipping would drop the one whose real risk — an undeclared dependency on the icon
 library — is exactly what that test exists to catch.
 
+## Alerts
+
+`Alert` is a message that belongs on the page. `Toast` (UKIT-8) is transient feedback
+about something that already happened. If it is still true after a reload, it is an
+alert.
+
+- **Urgency is part of the variant, not a separate prop.** `warn` and `danger` render
+  `role="alert"`, which is assertive and interrupts a screen reader mid-sentence;
+  `info` and `ok` render `role="status"`, which waits. Anything added later that speaks
+  makes the same choice deliberately rather than defaulting to `alert` because it is
+  the more familiar word.
+- **Colour never carries a difference on its own.** WCAG 1.4.1. `warn` and `danger`
+  draw different glyphs, which is why `icons.ts` gained an `error` row: `alert` was
+  already the warning triangle, and one picture in two colours is not a distinction.
+  A test asserts all four variants render different SVG, so adding a fifth that reuses
+  a glyph fails the build.
+- **The kit never remembers a dismissal.** `onDismiss` fires and the alert stays on
+  screen. Whether a notice returns on the next load is a product decision, and a
+  component that hides itself cannot be brought back without a re-render the app did
+  not ask for. The same rule applies to anything dismissible added later.
+- **`banner` is a prop, not a second component.** A `Banner` would be an `Alert` with
+  two class names changed, and a second name for one thing drifts.
+- **The title is a `p`, and there is no `titleAs`.** Unlike `EmptyState`, which replaces
+  a region's content and may need a heading, an alert is a notice inside a region that
+  already has one. Adding a prop nobody needs is worse than the inconsistency.
+
 ## Brand
 
 `Brand` renders a product's identity: the monogram, then the name split across the
