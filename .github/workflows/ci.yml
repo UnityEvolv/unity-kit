@@ -23,6 +23,11 @@ jobs:
       - run: npm run test
       - run: npm run build
 
+      # Builds every story, so a broken story fails the PR. UKIT-24 publishes this
+      # output to GitHub Pages; it uploads the artifact from here rather than
+      # rebuilding, so a broken build can never overwrite the live site.
+      - run: npm run build-storybook
+
   blind-install:
     name: Blind install test
     runs-on: ubuntu-latest

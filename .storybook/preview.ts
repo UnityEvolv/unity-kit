@@ -1,0 +1,20 @@
+import type { Preview } from '@storybook/react-vite'
+import { withThemeByDataAttribute } from '@storybook/addon-themes'
+import './preview.css'
+
+const preview: Preview = {
+  parameters: {
+    controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+  },
+  decorators: [
+    // daisyUI themes are selected with data-theme on the root element, so every story
+    // can be checked in both without any per-story setup.
+    withThemeByDataAttribute({
+      themes: { light: 'light', dark: 'dark' },
+      defaultTheme: 'light',
+      attributeName: 'data-theme',
+    }),
+  ],
+}
+
+export default preview

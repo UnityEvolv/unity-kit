@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@import "../src/theme.css";
+
+/* Stories live in src, so Tailwind scans the source here rather than dist. */
+@source "../src";
+
+/* Make the canvas follow the selected theme, not just the components on it. */
+@layer base {
+  body {
+    background-color: var(--color-base-100);
+    color: var(--color-base-content);
+  }
+}

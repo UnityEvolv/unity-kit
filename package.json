@@ -31,7 +31,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "blind-test": "node scripts/blind-install-test.mjs",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "daisyui": "^5.0.0"
@@ -43,6 +45,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/addon-themes": "^10.6.0",
+    "@storybook/react-vite": "^10.6.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
@@ -56,6 +62,7 @@
     "jsdom": "^27.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "storybook": "^10.6.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8.70.0",
