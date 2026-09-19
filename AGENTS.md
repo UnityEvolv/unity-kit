@@ -161,6 +161,22 @@ Leave it off and the test fails by name asking for it. It does not skip the comp
 because skipping would drop the one whose real risk — an undeclared dependency on the icon
 library — is exactly what that test exists to catch.
 
+## Brand
+
+`Brand` renders a product's identity: the monogram, then the name split across the
+secondary and primary tones. Products live in one table inside the component, so adding
+one is a row and nothing else.
+
+- **The marks in `src/components/Brand/marks.tsx` are placeholder artwork.** They are
+  geometric letterforms at the right proportions and colour split, not the real logo,
+  which the website only ships as a PNG. Replacing them is that file alone — `Brand` asks
+  for a mark at a height and nothing more — so do not work around them elsewhere.
+- **The two-tone split is decoration, not information.** The wordmark is `aria-hidden` and
+  the wrapper carries the full product name, so a screen reader says `unityofis` once
+  rather than reading two fragments. Keep it that way when adding a product.
+- `ofiskit` shares the UO mark with `unityofis` on purpose: the engine carries the
+  product's mark rather than earning a third one.
+
 ## Styling conventions
 
 - Use daisyUI semantic tokens (`bg-primary`, `text-base-content`), never raw Tailwind

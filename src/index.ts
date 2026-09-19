@@ -1,6 +1,9 @@
 export { Button } from './components/Button'
 export type { ButtonProps, ButtonVariant } from './components/Button'
 
+export { Brand, UEMark, UOMark } from './components/Brand'
+export type { BrandProps, BrandProduct, BrandSize, MarkProps } from './components/Brand'
+
 export { Icon, iconNames, iconSizes } from './components/Icon'
 export type { IconProps, IconName, IconSize } from './components/Icon'
 
