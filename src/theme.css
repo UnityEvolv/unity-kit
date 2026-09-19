@@ -1,8 +1,17 @@
 /*
+ * GENERATED FILE — do not edit.
+ *
+ * Written by scripts/generate-tokens.mjs from scripts/tokens.source.mjs.
+ * Change a colour there and run `npm run tokens`; CI fails if this file is
+ * edited directly or left stale.
+ */
+
+/*
  * unitykit theme.
  *
- * Deliberately does NOT `@import "tailwindcss"` — the consuming app does that once.
- * Importing it here too would pull a second copy of Tailwind into every consumer.
+ * Deliberately does NOT `@import "tailwindcss"` — the consuming app does that
+ * once. Importing it here too would pull a second copy of Tailwind into every
+ * consumer.
  *
  * Consuming apps use it like this:
  *
@@ -11,8 +20,166 @@
  *   @source "../node_modules/@unityevolv/unitykit/dist";
  */
 
+/* themes: false because the two below replace daisyUI's built-ins entirely. */
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
+  themes: false;
 }
 
-/* Brand token overrides land here in UKIT-3. */
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: #FFFFFF;
+  --color-base-200: #FAF8FC;
+  --color-base-300: #E6E1EE;
+  --color-base-content: #1B1A1F;
+  --color-primary: #7A3FD6;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #0C798A;
+  --color-secondary-content: #FFFFFF;
+  --color-accent: #0C798A;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #1B1A1F;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #0C798A;
+  --color-info-content: #FFFFFF;
+  --color-success: #297D4E;
+  --color-success-content: #FFFFFF;
+  --color-warning: #97641A;
+  --color-warning-content: #FFFFFF;
+  --color-error: #BE4736;
+  --color-error-content: #FFFFFF;
+
+  /* Brand tokens with no daisyUI equivalent, so they switch with the theme. */
+  --ue-bg: #FAF8FC;
+  --ue-surface: #FFFFFF;
+  --ue-surface-raised: #FFFFFF;
+  --ue-line: #E6E1EE;
+  --ue-ink: #1B1A1F;
+  --ue-muted: #6B6577;
+  --ue-primary: #7A3FD6;
+  --ue-primary-hover: #6A33BF;
+  --ue-primary-ink: #FFFFFF;
+  --ue-secondary: #0C798A;
+  --ue-secondary-ink: #FFFFFF;
+  --ue-status-ink: #FFFFFF;
+  --ue-ok: #297D4E;
+  --ue-warn: #97641A;
+  --ue-danger: #BE4736;
+  --ue-info: #0C798A;
+  --ue-focus: #7A3FD666;
+
+  --radius-selector: 6px;
+  --radius-field: 6px;
+  --radius-box: 8px;
+  --border: 1px;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #1C1B20;
+  --color-base-200: #121212;
+  --color-base-300: #2E2C35;
+  --color-base-content: #FFFFFF;
+  --color-primary: #C27FFF;
+  --color-primary-content: #121212;
+  --color-secondary: #25E0F8;
+  --color-secondary-content: #121212;
+  --color-accent: #25E0F8;
+  --color-accent-content: #121212;
+  --color-neutral: #26242C;
+  --color-neutral-content: #FFFFFF;
+  --color-info: #25E0F8;
+  --color-info-content: #121212;
+  --color-success: #5CD68C;
+  --color-success-content: #121212;
+  --color-warning: #F2B84B;
+  --color-warning-content: #121212;
+  --color-error: #F06A6A;
+  --color-error-content: #121212;
+
+  /* Brand tokens with no daisyUI equivalent, so they switch with the theme. */
+  --ue-bg: #121212;
+  --ue-surface: #1C1B20;
+  --ue-surface-raised: #26242C;
+  --ue-line: #2E2C35;
+  --ue-ink: #FFFFFF;
+  --ue-muted: #A9A3B5;
+  --ue-primary: #C27FFF;
+  --ue-primary-hover: #D29BFF;
+  --ue-primary-ink: #121212;
+  --ue-secondary: #25E0F8;
+  --ue-secondary-ink: #121212;
+  --ue-status-ink: #121212;
+  --ue-ok: #5CD68C;
+  --ue-warn: #F2B84B;
+  --ue-danger: #F06A6A;
+  --ue-info: #25E0F8;
+  --ue-focus: #C27FFF66;
+
+  --radius-selector: 6px;
+  --radius-field: 6px;
+  --radius-box: 8px;
+  --border: 1px;
+}
+
+/*
+ * Brand-named utilities (text-ink, bg-surface, border-line) for consuming apps.
+ *
+ * These are aliases, not a second palette: each resolves to the daisyUI
+ * variable holding the same value. Inside unitykit's own components use the
+ * daisyUI names, because daisyUI generates its component classes (btn-primary,
+ * alert-error) from those names and they cannot be avoided — one vocabulary per
+ * file. `npm run lint` enforces that.
+ */
+@theme inline {
+  --color-ink: var(--color-base-content);
+  --color-bg: var(--color-base-200);
+  --color-surface: var(--color-base-100);
+  --color-line: var(--color-base-300);
+  --color-primary-ink: var(--color-primary-content);
+  --color-secondary-ink: var(--color-secondary-content);
+  --color-ok: var(--color-success);
+  --color-warn: var(--color-warning);
+  --color-danger: var(--color-error);
+  --color-muted: var(--ue-muted);
+  --color-surface-raised: var(--ue-surface-raised);
+  --color-primary-hover: var(--ue-primary-hover);
+  --color-focus: var(--ue-focus);
+}
+
+/* Type, radius, shadow and spacing scales. */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 3px 0 rgb(0 0 0 / 0.10);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.10), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+
+  --spacing: 0.25rem;
+}

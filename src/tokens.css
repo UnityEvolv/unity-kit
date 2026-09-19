@@ -1,0 +1,81 @@
+/*
+ * GENERATED FILE — do not edit.
+ *
+ * Written by scripts/generate-tokens.mjs from scripts/tokens.source.mjs.
+ * Change a colour there and run `npm run tokens`; CI fails if this file is
+ * edited directly or left stale.
+ */
+
+/*
+ * The brand palette as plain custom properties, for consumers that want the
+ * values without daisyUI — raw CSS, SVG, canvas. Apps using the kit's
+ * components import theme.css instead, which already carries these.
+ *
+ *   @import "@unityevolv/unitykit/tokens.css";
+ */
+
+:root {
+  color-scheme: light;
+  --ue-bg: #FAF8FC;
+  --ue-surface: #FFFFFF;
+  --ue-surface-raised: #FFFFFF;
+  --ue-line: #E6E1EE;
+  --ue-ink: #1B1A1F;
+  --ue-muted: #6B6577;
+  --ue-primary: #7A3FD6;
+  --ue-primary-hover: #6A33BF;
+  --ue-primary-ink: #FFFFFF;
+  --ue-secondary: #0C798A;
+  --ue-secondary-ink: #FFFFFF;
+  --ue-status-ink: #FFFFFF;
+  --ue-ok: #297D4E;
+  --ue-warn: #97641A;
+  --ue-danger: #BE4736;
+  --ue-info: #0C798A;
+  --ue-focus: #7A3FD666;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ue-bg: #121212;
+  --ue-surface: #1C1B20;
+  --ue-surface-raised: #26242C;
+  --ue-line: #2E2C35;
+  --ue-ink: #FFFFFF;
+  --ue-muted: #A9A3B5;
+  --ue-primary: #C27FFF;
+  --ue-primary-hover: #D29BFF;
+  --ue-primary-ink: #121212;
+  --ue-secondary: #25E0F8;
+  --ue-secondary-ink: #121212;
+  --ue-status-ink: #121212;
+  --ue-ok: #5CD68C;
+  --ue-warn: #F2B84B;
+  --ue-danger: #F06A6A;
+  --ue-info: #25E0F8;
+  --ue-focus: #C27FFF66;
+}
+
+/* Follow the operating system until an app sets data-theme explicitly. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --ue-bg: #121212;
+    --ue-surface: #1C1B20;
+    --ue-surface-raised: #26242C;
+    --ue-line: #2E2C35;
+    --ue-ink: #FFFFFF;
+    --ue-muted: #A9A3B5;
+    --ue-primary: #C27FFF;
+    --ue-primary-hover: #D29BFF;
+    --ue-primary-ink: #121212;
+    --ue-secondary: #25E0F8;
+    --ue-secondary-ink: #121212;
+    --ue-status-ink: #121212;
+    --ue-ok: #5CD68C;
+    --ue-warn: #F2B84B;
+    --ue-danger: #F06A6A;
+    --ue-info: #25E0F8;
+    --ue-focus: #C27FFF66;
+  }
+}

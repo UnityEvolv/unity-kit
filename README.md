@@ -54,6 +54,61 @@ Chosen because:
 The cost is the `@source` requirement above. `theme.css` deliberately does not
 `@import "tailwindcss"` itself — the consuming app does that once.
 
+## Design tokens
+
+The UnityEvolv palette ships in both themes. Importing `theme.css` is enough — it carries
+the tokens, the daisyUI themes built from them and the brand-named utilities.
+
+```tsx
+<html data-theme="dark">
+```
+
+Without `data-theme`, the kit follows the operating system via `prefers-color-scheme` and
+switches the moment an app sets the attribute.
+
+Colours are available three ways:
+
+```tsx
+// daisyUI names — use these inside components
+<p className="text-base-content bg-base-100" />
+
+// brand aliases — for consuming apps
+<p className="text-ink bg-surface border-line" />
+
+// literal values, for charts, canvas, SVG and Remotion
+import { tokens } from '@unityevolv/unitykit'
+tokens.dark.primary // '#C27FFF'
+```
+
+Apps that want only the values, with no daisyUI, can import them alone:
+
+```css
+@import "@unityevolv/unitykit/tokens.css";   /* --ue-primary, --ue-ink, ... */
+```
+
+### One source, generated three ways
+
+Every value lives in `scripts/tokens.source.mjs`. `src/tokens.ts`, `src/tokens.css` and
+`src/theme.css` are generated from it by `npm run tokens`, and CI fails if a generated file
+is stale or hand-edited. The palette exists in three forms because consumers need all
+three, and three hand-kept copies drift — usually the one the contrast page reads, so the
+page ends up reporting a number the build does not ship.
+
+### Contrast is a build gate, not a page
+
+`src/contrast.test.ts` asserts WCAG AA (4.5:1) for every text-weight pair in both themes,
+reading the same tokens the CSS is generated from. A colour that breaks contrast fails the
+pull request. The `Foundations/Tokens` Storybook page renders every ratio from the same
+functions — it is the readable view, not the check.
+
+Four light-mode values are deeper than the raw brand palette. `#25E0F8` cyan measures
+1.6:1 on white and `#C27FFF` lavender 2.1:1, so neither can carry text in light mode; the
+brand is dark-first. The light theme uses deepened partners of the same hue, and dark mode
+uses the brand values unchanged.
+
+`line` is exempt from the contrast check by design: WCAG 1.4.11 covers boundaries that
+carry meaning, not dividers that merely separate content.
+
 ## Local development
 
 ```bash
@@ -128,7 +183,9 @@ CI builds every story, so a broken story fails the PR.
 | --- | --- |
 | `npm run build` | Build `dist/` — ESM bundle, `.d.ts` declarations, `theme.css` |
 | `npm run dev` | Same, in watch mode |
-| `npm run lint` | ESLint, including the static-class-name rule |
+| `npm run tokens` | Regenerate the token files from `scripts/tokens.source.mjs` |
+| `npm run tokens:check` | Fail if a generated token file is stale or hand-edited |
+| `npm run lint` | ESLint: static class names, and daisyUI naming inside components |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run test` | Vitest unit tests |
 | `npm run blind-test` | Pack and install into a throwaway app (see above) |
@@ -154,3 +211,22 @@ component renders with correct markup and no styling, and nothing errors — the
 as a missing `@source` line. Keep every class name written out in full, in a lookup object
 or a CVA config. This is the main reason UKIT-5 moves the library onto
 class-variance-authority.
+
+### Use daisyUI's colour names inside components
+
+The kit publishes two names for most colours — daisyUI's (`base-content`, `error`) and the
+brand's (`ink`, `danger`). Both are real utilities. Inside `src/components/**`, use
+daisyUI's:
+
+```tsx
+<p className="text-base-content bg-base-100" />   // in the kit
+<p className="text-ink bg-surface" />             // in a consuming app
+```
+
+daisyUI generates its component classes from its own token names — `btn-primary`,
+`alert-error` — and there is no way to write `btn-ink`, so that vocabulary is already
+unavoidable here. A second one would mean two names for the same colour in the same file.
+`npm run lint` rejects a brand alias in a component.
+
+The brand aliases exist because consuming apps write their own markup, where no daisyUI
+component class is involved, and `text-ink` reads better than `text-base-content`.
