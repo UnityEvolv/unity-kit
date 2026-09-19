@@ -110,18 +110,25 @@ export default defineConfig({
   // silently produces no CSS, which is one of the two failures under test.
   writeFileSync(
     join(app, 'src', 'index.css'),
-    `@import "tailwindcss";\n@import "unitykit/theme.css";\n@source "../node_modules/unitykit/dist";\n`,
+    `@import "tailwindcss";\n@import "@unityevolv/unitykit/theme.css";\n@source "../node_modules/@unityevolv/unitykit/dist";\n`,
   )
 
   writeFileSync(
     join(app, 'src', 'components.js'),
-    `import * as kit from 'unitykit'
+    `import * as kit from '@unityevolv/unitykit'
 
-const isComponent = (value) =>
-  typeof value === 'function' ||
-  (typeof value === 'object' && value !== null && 'render' in value)
+// The kit also exports plain helpers (contrastRatio, meetsAA), which must not be
+// rendered as components. React requires a capitalised name for anything usable in
+// JSX, so the name is the one signal that separates the two without this script
+// carrying a hand-maintained list that new components would have to be added to.
+const isComponent = (name, value) =>
+  /^[A-Z]/.test(name) &&
+  (typeof value === 'function' ||
+    (typeof value === 'object' && value !== null && 'render' in value))
 
-export const components = Object.entries(kit).filter(([, value]) => isComponent(value))
+export const components = Object.entries(kit).filter(([name, value]) =>
+  isComponent(name, value),
+)
 `,
   )
 

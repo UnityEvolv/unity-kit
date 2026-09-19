@@ -54,8 +54,8 @@ app using the kit needs all three lines:
 
 ```css
 @import "tailwindcss";
-@import "unitykit/theme.css";
-@source "../node_modules/unitykit/dist";
+@import "@unityevolv/unitykit/theme.css";
+@source "../node_modules/@unityevolv/unitykit/dist";
 ```
 
 **3. Every runtime import must be declared** in `dependencies` or `peerDependencies`.
@@ -70,11 +70,82 @@ three CSS lines and render one component. It passes only if the component render
 **styled**. This catches both missing CSS scanning and undeclared dependencies, neither of
 which reproduces on the author's machine.
 
+## Design tokens
+
+The UnityEvolv palette lives in `scripts/tokens.source.mjs` and **nowhere else**.
+`src/tokens.ts`, `src/tokens.css` and `src/theme.css` are generated from it:
+
+```bash
+npm run tokens         # regenerate after changing a value
+npm run tokens:check    # what CI runs; fails if a generated file is stale or hand-edited
+```
+
+UKIT-29 needs the same palette in three forms at once — custom properties, a typed
+object, and daisyUI theme definitions. Three hand-kept copies drift, and the copy that
+drifts is usually the one the contrast page reads, so the page reports a number the build
+does not ship. Generating all three removes that failure entirely.
+
+`src/contrast.test.ts` asserts contrast for every pair in both themes, so a colour that
+breaks it fails the pull request. The Storybook page at `Foundations/Tokens` renders from
+the same functions — it is the readable view, not the gate.
+
+Every hover value is checked as well as its base, because a hover state that drops below AA
+is the easiest one to miss — nobody screenshots it.
+
+`line` is exempt. WCAG 1.4.11 covers boundaries that carry meaning, and holding a plain
+divider to 3:1 forces it to read as a heavy rule.
+
+Four light-mode values differ from UKIT-29's first draft. Its `secondary`/`info`, `ok`,
+`warn` and `danger` measured 3.83, 4.25, 3.64 and 4.49 against the light background, below
+the AA the story also required, so each was deepened along its own hue until it cleared
+4.5:1 with headroom. The story now carries the deepened values, so they are not a
+deviation — but the originals are still in older drafts, and restoring one would fail the
+build rather than pass silently. Dark mode was never changed; it already passes everywhere.
+
+### There is no third hue
+
+Two hues plus the status colours is the whole palette. An accent was tried and removed: any
+third hue that carries white text at AA lands in the warm band already occupied by `warn`
+and `danger`. Measured with CIEDE2000, amber at that lightness is ΔE 1.7 from `warn` —
+the same colour — and the best warm option anywhere is ΔE 14.6, against a palette that
+otherwise spaces its colours 22–29 apart.
+
+daisyUI always emits an accent, so `--color-accent` is aliased to primary. Without that,
+any consumer writing `btn-accent` would get daisyUI's default teal and nothing would fail.
+`src/contrast.test.ts` reads the generated theme and asserts the alias holds.
+
+Highlights that are not actions — a raised hand, an unread mention, a recording indicator —
+use `secondary`.
+
 ## Styling conventions
 
 - Use daisyUI semantic tokens (`bg-primary`, `text-base-content`), never raw Tailwind
   colours, so themes stay consistent.
-- Muted and disabled text uses opacity modifiers (`text-base-content/60`, `/40`) rather
-  than picked greys, so it stays correct in both light and dark.
+- **Inside components, daisyUI's colour names are the canonical ones.** The kit publishes
+  brand aliases too (`text-ink`, `bg-surface`, `border-line`, `text-danger`), but those are
+  for consuming apps. daisyUI generates its component classes from its own token names —
+  `btn-primary`, `alert-error` — and there is no way to write `btn-ink`, so daisyUI's
+  vocabulary cannot be removed from this repository. Adding a second one that components
+  also use would mean two names for the same colour in the same file. `npm run lint`
+  rejects a brand alias in `src/components/**` — but only one that *duplicates* a daisyUI
+  name. The rule is derived from the token source, so `muted`, `surface-raised`, the hover
+  steps and `focus` stay available everywhere: they have no daisyUI counterpart, and
+  forbidding them would leave components with no way to write them at all.
+- **Each colour has one job.** `primary` carries actions — buttons, join, the selected
+  item, the focus ring. `secondary` is the second voice: links, the active speaker, the
+  in-a-call status, and anything needing attention without being an action (a raised hand,
+  an unread mention, a recording indicator). `danger` is a real button variant, not only a
+  status colour — delete, remove, revoke, end, leave call — and has its own hover and ink
+  so a destructive button is as finished as a primary one. `ok` and `warn` are status;
+  `info` is a neutral notice. Everything else stays neutral so the content is the colour on
+  screen.
+- **Hover values are brand tokens, not daisyUI ones.** daisyUI derives a hover shade
+  automatically; UKIT-29 gives primary, secondary and danger their own. Components spell
+  them `hover:bg-primary-hover` and so on — these are `--ue-*` aliases with no daisyUI
+  counterpart, so the naming rule below does not apply to them.
+- Muted text uses the `muted` token (`text-muted`, or `--ue-muted` outside Tailwind), not
+  an opacity modifier. `text-base-content/60` composites to roughly 4.1:1 on the dark
+  background — below AA — whereas both `muted` values are checked in CI and pass. Opacity
+  modifiers are still right for **disabled** state, where AA does not apply.
 - Behaviour-heavy components sit on Radix primitives. daisyUI supplies appearance only —
   it ships no JavaScript. Do not hand-roll focus traps.

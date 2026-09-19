@@ -18,7 +18,7 @@ describe('Button', () => {
   it.each([
     ['primary', 'btn-primary'],
     ['secondary', 'btn-secondary'],
-    ['accent', 'btn-accent'],
+    ['danger', 'btn-error'],
   ] as const)('applies the full class name for variant %s', (variant, expected) => {
     render(<Button variant={variant}>Save</Button>)
     expect(screen.getByRole('button')).toHaveClass(expected)

@@ -18,6 +18,11 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      # Regenerates the token files and fails if the result differs from what is
+      # committed, so a hand-edited tokens.css or a stale daisyUI theme cannot ship.
+      - run: npm run tokens:check
+
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test

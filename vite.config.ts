@@ -7,18 +7,25 @@ import dts from 'vite-plugin-dts'
 
 const resolvePath = (relative: string) => fileURLToPath(new URL(relative, import.meta.url))
 
+/**
+ * Tailwind source, not build artifacts. theme.css holds `@plugin "daisyui"`,
+ * which only the consuming app's Tailwind can resolve, and tokens.css must keep
+ * its custom properties intact. Both are copied verbatim so Vite's CSS pipeline
+ * never touches them.
+ */
+const cssSources = ['theme.css', 'tokens.css']
+
 export default defineConfig({
   plugins: [
     react(),
-    dts({ include: ['src'], exclude: ['**/*.stories.tsx', '**/*.test.tsx'] }),
+    dts({ include: ['src'], exclude: ['**/*.stories.tsx', '**/*.test.ts', '**/*.test.tsx'] }),
     {
-      // theme.css is Tailwind source, not a build artifact: it holds `@plugin "daisyui"`,
-      // which only the consuming app's Tailwind can resolve. Copy it verbatim so Vite's
-      // CSS pipeline never touches it.
       name: 'unitykit:copy-theme',
       closeBundle() {
         mkdirSync(resolvePath('./dist'), { recursive: true })
-        copyFileSync(resolvePath('./src/theme.css'), resolvePath('./dist/theme.css'))
+        for (const file of cssSources) {
+          copyFileSync(resolvePath(`./src/${file}`), resolvePath(`./dist/${file}`))
+        }
       },
     },
   ],
