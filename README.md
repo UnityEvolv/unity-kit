@@ -126,6 +126,55 @@ is ΔE 1.7 from `warn`, which is the same colour. daisyUI always emits an accent
 `--color-accent` is aliased to primary and `btn-accent` can never introduce one; a test
 asserts that alias against the generated theme.
 
+## Icons
+
+One component, so no app ever imports an icon library directly.
+
+```tsx
+import { Icon } from '@unityevolv/unitykit'
+
+<Icon name="mic" />                              // 20px, decorative
+<Icon name="lock" size="sm" />                   // 16px
+<Icon name="record" title="Recording" />         // labelled for screen readers
+```
+
+Names are the kit's own, not the library's — `share`, not `monitor-up`; `record`, not
+`circle-dot`. They are typed as a union, so an unknown name is a compile error rather than
+a blank space. The mapping lives in one table in `src/components/Icon/icons.ts`, the only
+file in the repository that names a Lucide component; swapping libraries later is that
+file rather than every call site. `npm run lint` fails a direct `lucide-react` import
+anywhere else.
+
+Sizes match the type scale: `xs` 14, `sm` 16, `md` 20 (default), `lg` 24, `xl` 32. There is
+no numeric size prop — anything larger than 32 is an illustration, not an icon, and the
+union is what keeps that true.
+
+**Colour always comes from `currentColor`.** An icon never sets its own, so it inherits
+from the text around it and every theme and token works without the icon knowing they
+exist. Colour a parent, not the icon.
+
+### Labelling
+
+An icon is decorative by default: `aria-hidden`, and out of the tab order. An icon-only
+button takes its name from the button, so giving the icon a `title` as well makes a screen
+reader announce the same thing twice.
+
+```tsx
+<button aria-label="Mute microphone"><Icon name="mic-off" size="sm" /></button>
+<Icon name="record" title="Recording" />   // standalone and meaningful
+```
+
+### The custom set
+
+Six icons are drawn here because Lucide has no equivalent, or none in the right sense:
+`knock`, `raise-hand`, `reception`, `break-room`, `office`, `provider`. They use the same
+24px viewBox, 2px stroke and round caps Lucide emits, so they sit beside it without looking
+foreign — the `Primitives/Icon` Storybook page shows them next to Lucide icons at the same
+size, which is the fastest way to spot one that does not.
+
+Nothing ships with an emoji as an icon. Emoji render differently on every platform and
+cannot take a colour.
+
 ## Local development
 
 ```bash
@@ -164,17 +213,33 @@ workspace installs both resolve packages the kit never declared.
 
 It renders every exported component, collects the class names they emit, and requires each
 one to resolve to a non-empty rule in the app's compiled CSS. New components are covered
-automatically, with no per-component setup.
+automatically — a component whose props are all optional needs no setup at all.
+
+A component with a **required** prop declares one valid set, because the test renders
+blind and has no way to know:
+
+```tsx
+Icon.sampleProps = { name: 'mic' } satisfies IconProps
+```
+
+Without it the test fails by name and tells you to add one, rather than skipping the
+component — skipping would quietly drop the component most likely to have a packaging
+problem.
 
 That fails the build on:
 
 - **an undeclared runtime dependency** — npm's flat `node_modules` resolves these locally
   and then fails for consumers on a clean install
 - **a missing `@source` line**, which stops Tailwind scanning the kit entirely
+- **any component that throws from a clean install**, reported by export name
 
-It does *not* catch a class name assembled from a variable; daisyUI emits its modifier
-rules whenever the base component class is present, so the CSS exists either way. `npm run
-lint` guards that instead.
+Two things it does *not* catch:
+
+- **A class name assembled from a variable.** daisyUI emits its modifier rules whenever the
+  base component class is present, so the CSS exists either way. `npm run lint` guards that.
+- **Marker classes.** Lucide stamps `lucide lucide-mic` on every icon; those are hooks, not
+  styling, and are skipped by an explicit list in the script. An ignored class is an
+  unchecked class, so that list should stay as short as it can be.
 
 Use `npm run blind-test -- --keep` to leave the generated app in place for inspection.
 

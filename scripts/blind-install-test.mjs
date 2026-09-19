@@ -30,6 +30,16 @@ import { join, resolve } from 'node:path'
 const KIT_ROOT = resolve(import.meta.dirname, '..')
 const KEEP = process.argv.includes('--keep')
 
+/**
+ * Class names that are hooks rather than styling, and so are not expected to
+ * resolve to any CSS. Lucide stamps `lucide lucide-mic` on every icon it
+ * renders; requiring those to compile would fail every icon forever.
+ *
+ * Keep this list as short as it can be. An ignored class is an unchecked class,
+ * so anything added here is a hole in the guarantee below, not a convenience.
+ */
+const MARKER_CLASSES = /^lucide(-|$)/
+
 const run = (cmd, cwd) => execSync(cmd, { cwd, stdio: 'inherit', env: process.env })
 const capture = (cmd, cwd) => execSync(cmd, { cwd, encoding: 'utf8', env: process.env }).trim()
 
@@ -129,6 +139,12 @@ const isComponent = (name, value) =>
 export const components = Object.entries(kit).filter(([name, value]) =>
   isComponent(name, value),
 )
+
+// A component with a required prop cannot be rendered blind. Rather than skip it
+// — which would drop the component most likely to have a packaging problem — the
+// component declares one valid set of props as a \`sampleProps\` static, and this
+// renders with that. Components whose props are all optional declare nothing.
+export const propsFor = (Component) => Component.sampleProps ?? null
 `,
   )
 
@@ -136,11 +152,13 @@ export const components = Object.entries(kit).filter(([name, value]) =>
     join(app, 'src', 'main.jsx'),
     `import { createElement } from 'react'
 import { createRoot } from 'react-dom/client'
-import { components } from './components.js'
+import { components, propsFor } from './components.js'
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
-  components.map(([name, Component]) => createElement(Component, { key: name }, name)),
+  components.map(([name, Component]) =>
+    createElement(Component, { key: name, ...propsFor(Component) }, name),
+  ),
 )
 `,
   )
@@ -151,13 +169,23 @@ createRoot(document.getElementById('root')).render(
     join(app, 'render.mjs'),
     `import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { components } from './src/components.js'
+import { components, propsFor } from './src/components.js'
 
+// Each render is caught so one broken component reports itself by name instead
+// of crashing the run with a React stack that never mentions which export it was.
+const failures = []
 const html = components
-  .map(([name, Component]) => renderToStaticMarkup(createElement(Component, null, name)))
+  .map(([name, Component]) => {
+    try {
+      return renderToStaticMarkup(createElement(Component, propsFor(Component), name))
+    } catch (error) {
+      failures.push({ name, message: error.message })
+      return ''
+    }
+  })
   .join('')
 
-console.log(JSON.stringify({ names: components.map(([name]) => name), html }))
+console.log(JSON.stringify({ names: components.map(([name]) => name), html, failures }))
 `,
   )
 
@@ -171,16 +199,31 @@ console.log(JSON.stringify({ names: components.map(([name]) => name), html }))
   if (rendered.names.length === 0) {
     throw new Error('the kit exported no components to render')
   }
+  if (rendered.failures?.length) {
+    throw new Error(
+      `${rendered.failures.length} component(s) failed to render from a clean install:\n` +
+        rendered.failures.map((f) => `  - ${f.name}: ${f.message}`).join('\n') +
+        `\n\nIf the component has a required prop, declare one valid set on it:\n` +
+        `  ComponentName.sampleProps = { ... }\n`,
+    )
+  }
   console.log(`rendered ${rendered.names.length}: ${rendered.names.join(', ')}`)
 
   const used = new Set()
+  const ignored = new Set()
   for (const [, value] of rendered.html.matchAll(/class="([^"]*)"/g)) {
-    for (const cls of value.split(/\s+/).filter(Boolean)) used.add(cls)
+    for (const cls of value.split(/\s+/).filter(Boolean)) {
+      if (MARKER_CLASSES.test(cls)) ignored.add(cls)
+      else used.add(cls)
+    }
   }
   if (used.size === 0) {
     throw new Error('no class names were emitted, so styling cannot be verified')
   }
   console.log(`class names in use: ${[...used].join(', ')}`)
+  if (ignored.size) {
+    console.log(`ignored marker classes: ${[...ignored].join(', ')}`)
+  }
 
   step('Building the consumer app')
   run('npx vite build', app)

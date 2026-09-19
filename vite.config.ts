@@ -1,5 +1,5 @@
 /// <reference types="vitest/config" />
-import { copyFileSync, mkdirSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -14,6 +14,24 @@ const resolvePath = (relative: string) => fileURLToPath(new URL(relative, import
  * never touches them.
  */
 const cssSources = ['theme.css', 'tokens.css']
+
+/**
+ * Everything declared in package.json stays external, derived rather than
+ * listed so adding a dependency cannot silently bundle it.
+ *
+ * Vite's library mode bundles anything it is not told to externalise. That is
+ * right for an app and wrong for a library: a bundled dependency ships a second
+ * copy to every consumer that already has it, and with an icon set it also
+ * defeats the tree-shaking the library was chosen for. The subpath pattern
+ * covers imports like `react/jsx-runtime`.
+ */
+const pkg = JSON.parse(readFileSync(resolvePath('./package.json'), 'utf8'))
+const externalNames = [
+  ...Object.keys(pkg.dependencies ?? {}),
+  ...Object.keys(pkg.peerDependencies ?? {}),
+]
+const external = (id: string) =>
+  externalNames.some((name) => id === name || id.startsWith(`${name}/`))
 
 export default defineConfig({
   plugins: [
@@ -36,7 +54,7 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external,
     },
     sourcemap: true,
   },

@@ -117,6 +117,40 @@ any consumer writing `btn-accent` would get daisyUI's default teal and nothing w
 Highlights that are not actions — a raised hand, an unread mention, a recording indicator —
 use `secondary`.
 
+## Icons
+
+Every icon goes through `<Icon name="..." />`. `src/components/Icon/icons.ts` is the only
+file allowed to name a Lucide component, and `npm run lint` fails a direct `lucide-react`
+import anywhere else — including a type-only import. That is what keeps a library swap to
+one table instead of every call site.
+
+- **Names are ours, and describe the job, not the drawing.** `share`, not `monitor-up`;
+  `record`, not `circle-dot`; `trash`, not `trash-2`. A few coincide with Lucide's because
+  the obvious word is the same. Adding an icon means adding a row to the table, which is
+  also what makes it appear in the Storybook page and in the test that walks every name.
+- **Colour is never set by the icon.** It inherits `currentColor`, so colour the parent.
+  An icon that sets its own colour breaks in the other theme and nobody notices until a
+  screenshot.
+- **Sizes are a union, not a number.** `xs` 14 through `xl` 32. Anything larger is an
+  illustration, and the type is what enforces that without a runtime check.
+- **Decorative by default.** An icon is `aria-hidden` unless given a `title`. An icon-only
+  button takes its name from the button; adding a `title` as well announces it twice.
+- **New custom icons match Lucide's geometry**: 24x24 viewBox, 2px stroke, `currentColor`,
+  round caps and joins. Put them in `customIcons.tsx` with a comment saying why Lucide's
+  equivalent did not work — the tests assert the geometry, but not the reason.
+- Never ship an emoji as an icon.
+
+A component with a required prop must declare `sampleProps`, because the blind install
+test renders every export blind:
+
+```tsx
+Icon.sampleProps = { name: 'mic' } satisfies IconProps
+```
+
+Leave it off and the test fails by name asking for it. It does not skip the component,
+because skipping would drop the one whose real risk — an undeclared dependency on the icon
+library — is exactly what that test exists to catch.
+
 ## Styling conventions
 
 - Use daisyUI semantic tokens (`bg-primary`, `text-base-content`), never raw Tailwind
