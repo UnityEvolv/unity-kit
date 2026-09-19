@@ -1,13 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { contrastRatio, meetsAA, relativeLuminance } from './contrast'
-import {
-  AA_NON_TEXT,
-  AA_TEXT,
-  contrastPairs,
-  indicatorPairs,
-  tokens,
-  type ThemeName,
-} from './tokens'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { AA_TEXT, contrastPairs, tokens, type ThemeName } from './tokens'
 
 describe('contrastRatio', () => {
   it('returns 21 for black on white', () => {
@@ -56,38 +51,23 @@ describe.each(Object.keys(tokens) as ThemeName[])('%s theme meets WCAG AA', (the
     ).toBe(true)
   })
 
-  // Indicators are held to WCAG 1.4.11 rather than 1.4.3. Checking them at all
-  // is the point: without this tier an indicator-only colour would simply go
-  // unverified, which is how accent shipped at 3.85:1 in the first draft.
-  it.each(indicatorPairs)('indicator: %s on %s', (foreground, background) => {
-    const fg = tokens[theme][foreground]
-    const bg = tokens[theme][background]
-    const ratio = contrastRatio(fg, bg)
-
-    expect(
-      meetsAA(fg, bg, AA_NON_TEXT),
-      `${theme}: ${foreground} (${fg}) on ${background} (${bg}) is ${ratio.toFixed(2)}:1, below the ${AA_NON_TEXT}:1 required for a non-text UI component`,
-    ).toBe(true)
-  })
 })
 
 /**
- * Two tokens that are meant to mean different things have to look different.
- * `accent` and `warn` share a hue by the story's own choice, so lightness is
- * the only thing separating them; this pins that separation so a later nudge
- * to either value cannot quietly collapse them into the same colour.
+ * UKIT-29 requires that no accent colour appears anywhere. daisyUI always
+ * emits an accent, so the guarantee is that its accent is primary rather than
+ * a third colour — without this, a consumer writing `btn-accent` would get
+ * daisyUI's default teal and nothing would fail.
  */
-describe.each(Object.keys(tokens) as ThemeName[])('%s theme keeps roles apart', (theme) => {
-  it('accent is distinguishable from warn', () => {
-    const ratio = contrastRatio(tokens[theme].accent, tokens[theme].warn)
-    expect(
-      ratio >= 1.15,
-      `${theme}: accent (${tokens[theme].accent}) and warn (${tokens[theme].warn}) differ by only ${ratio.toFixed(2)}:1`,
-    ).toBe(true)
-  })
+describe.each(Object.keys(tokens) as ThemeName[])('%s theme has no third hue', (theme) => {
+  it('daisyUI accent resolves to primary', () => {
+    // Read from the repo root rather than import.meta.url: Vitest serves test
+    // modules over a non-file URL, so new URL(..., import.meta.url) throws.
+    const css = readFileSync(resolve(process.cwd(), 'src/theme.css'), 'utf8')
+    const block = css.split(`name: "${theme}"`)[1].split('}')[0]
+    const accent = block.match(/--color-accent:\s*(#[0-9A-Fa-f]{6})/)?.[1]
 
-  it('the three voices are three different colours', () => {
-    const { primary, secondary, accent } = tokens[theme]
-    expect(new Set([primary, secondary, accent]).size).toBe(3)
+    expect(accent, `no --color-accent found in the ${theme} theme block`).toBeDefined()
+    expect(accent?.toUpperCase()).toBe(tokens[theme].primary.toUpperCase())
   })
 })

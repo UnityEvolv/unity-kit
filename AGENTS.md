@@ -89,34 +89,34 @@ does not ship. Generating all three removes that failure entirely.
 breaks it fails the pull request. The Storybook page at `Foundations/Tokens` renders from
 the same functions — it is the readable view, not the gate.
 
-There are two tiers, because WCAG has two:
+Every hover value is checked as well as its base, because a hover state that drops below AA
+is the easiest one to miss — nobody screenshots it.
 
-- **Text, 4.5:1** (WCAG 1.4.3) — anything rendered as words, and the ink on every fill.
-- **Non-text, 3:1** (WCAG 1.4.11) — indicators, badge fills and graphical objects. `accent`
-  lives here. Holding it to the text bar is not the safer choice: it forces every indicator
-  dark enough that hues stop being distinguishable from each other.
+`line` is exempt. WCAG 1.4.11 covers boundaries that carry meaning, and holding a plain
+divider to 3:1 forces it to read as a heavy rule.
 
-`line` is exempt from both. WCAG 1.4.11 covers boundaries that carry meaning, and holding a
-plain divider to 3:1 forces it to read as a heavy rule.
+Four light-mode values deviate from UKIT-29 as written. The story's `secondary`/`info`,
+`ok`, `warn` and `danger` measure 3.83, 4.25, 3.64 and 4.49 against the light background,
+all below the AA its own "Done when" requires. Each is deepened along its own hue until it
+clears 4.5:1 with headroom. Dark mode uses the brand values unchanged; it already passes
+everywhere. If the literal hex values ever matter more than the AA clause, change them in
+the token source and record the failing pairs as accepted exceptions in the test — but the
+two cannot both hold, so make it a deliberate choice rather than a silent one.
 
-Five light-mode values deviate from UKIT-29 as written. The story's `secondary`/`info`,
-`ok`, `warn`, `danger` and `accent` measure 3.83, 4.25, 3.64, 4.49 and 3.85 against the
-light background, all below the AA its own acceptance criteria require. Each is deepened
-along its own hue until it clears its tier with headroom. Light `accent-ink` is dark rather
-than the story's white, which follows from accent sitting in the non-text tier. Dark mode
-uses the brand values unchanged; it already passes everywhere.
+### There is no third hue
 
-### accent and warn share a hue
+Two hues plus the status colours is the whole palette. An accent was tried and removed: any
+third hue that carries white text at AA lands in the warm band already occupied by `warn`
+and `danger`. Measured with CIEDE2000, amber at that lightness is ΔE 1.7 from `warn` —
+the same colour — and the best warm option anywhere is ΔE 14.6, against a palette that
+otherwise spaces its colours 22–29 apart.
 
-They are hue 37 and 36 in light, 36 and 39 in dark — the same colour. Shifting accent to
-gold does not fix it: forced to the same AA lightness, gold and ochre land at a luminance
-ratio of 1.00 to each other. They are separated here by lightness instead, 1.61 apart in
-light and 1.20 in dark, and `src/contrast.test.ts` pins that separation so a later nudge
-cannot quietly collapse them.
+daisyUI always emits an accent, so `--color-accent` is aliased to primary. Without that,
+any consumer writing `btn-accent` would get daisyUI's default teal and nothing would fail.
+`src/contrast.test.ts` reads the generated theme and asserts the alias holds.
 
-It works, but it is thin, and it is the reason a mention badge and a warning can look
-alike. A genuinely distinct third voice needs a different hue family — a brand decision,
-not an implementation one. Raise it before building anything that shows both at once.
+Highlights that are not actions — a raised hand, an unread mention, a recording indicator —
+use `secondary`.
 
 ## Styling conventions
 
@@ -128,13 +128,22 @@ not an implementation one. Raise it before building anything that shows both at 
   `btn-primary`, `alert-error` — and there is no way to write `btn-ink`, so daisyUI's
   vocabulary cannot be removed from this repository. Adding a second one that components
   also use would mean two names for the same colour in the same file. `npm run lint`
-  rejects a brand alias in `src/components/**`.
+  rejects a brand alias in `src/components/**` — but only one that *duplicates* a daisyUI
+  name. The rule is derived from the token source, so `muted`, `surface-raised`, the hover
+  steps and `focus` stay available everywhere: they have no daisyUI counterpart, and
+  forbidding them would leave components with no way to write them at all.
 - **Each colour has one job.** `primary` carries actions — buttons, join, the selected
   item, the focus ring. `secondary` is the second voice: links, the active speaker, the
-  in-a-call status. `accent` is attention that is *not* an action — a raised hand, an
-  unread mention, a recording indicator, a chart's second series — and is never a button's
-  default colour. `ok`/`warn`/`danger` are status; `info` is a neutral notice. Everything
-  else stays neutral so the content is the colour on screen.
+  in-a-call status, and anything needing attention without being an action (a raised hand,
+  an unread mention, a recording indicator). `danger` is a real button variant, not only a
+  status colour — delete, remove, revoke, end, leave call — and has its own hover and ink
+  so a destructive button is as finished as a primary one. `ok` and `warn` are status;
+  `info` is a neutral notice. Everything else stays neutral so the content is the colour on
+  screen.
+- **Hover values are brand tokens, not daisyUI ones.** daisyUI derives a hover shade
+  automatically; UKIT-29 gives primary, secondary and danger their own. Components spell
+  them `hover:bg-primary-hover` and so on — these are `--ue-*` aliases with no daisyUI
+  counterpart, so the naming rule below does not apply to them.
 - Muted text uses the `muted` token (`text-muted`, or `--ue-muted` outside Tailwind), not
   an opacity modifier. `text-base-content/60` composites to roughly 4.1:1 on the dark
   background — below AA — whereas both `muted` values are checked in CI and pass. Opacity

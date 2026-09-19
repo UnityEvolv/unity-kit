@@ -6,31 +6,20 @@
  * `scripts/generate-tokens.mjs`, and CI fails if they drift, so a colour can
  * only ever be changed in one place.
  *
- * Three deviations from UKIT-29 as written, all recorded on the story:
+ * Two hues and the status colours are the whole palette. There is no accent
+ * token: a third hue collided with `warn`, and the app's main screen is a
+ * full-colour illustration the interface should not compete with. daisyUI
+ * requires an accent, so it is aliased to primary and `btn-accent` never
+ * introduces a third colour.
  *
- * 1. Five light values are deepened. The story's secondary/info (#0E8FA3), ok
- *    (#2E8B57), warn (#B7791F), danger (#C8503F) and accent (#B0761A) measure
- *    3.83, 4.25, 3.64, 4.49 and 3.85 against the light background, all below
- *    the AA its own acceptance criteria require. Each moves along its own hue
- *    until it clears its tier with headroom. Dark mode is untouched.
- *
- * 2. Light-mode `accent` is held to 3:1, not 4.5:1, and takes dark ink. The
- *    story's roles make accent an indicator and never text -- a raised hand, a
- *    mention badge, a recording dot, a chart series, a selected cell -- so
- *    WCAG 1.4.11 (3:1, non-text) is the applicable bar rather than 1.4.3.
- *    Holding it to 4.5:1 would turn it into a dark brown indistinguishable
- *    from `warn`; see the collision note below.
- *
- * 3. Light `accent-ink` is #1B1A1F rather than the story's #FFFFFF, which
- *    follows from 2: the lighter amber carries dark text, not white.
- *
- * Known collision, flagged for a brand decision. `accent` and `warn` are the
- * same hue -- 37 and 36 in light, 36 and 39 in dark. At equal AA lightness they
- * are literally the same colour, so shifting accent to gold does not help:
- * forced to 4.5:1 both land at a luminance ratio of 1.00 to each other. They
- * are separated here by lightness instead (1.61 apart in light, 1.20 in dark),
- * which works but is thin. A genuinely distinct third voice needs a different
- * hue family, which is a brand call rather than an implementation one.
+ * One deviation from UKIT-29 as written. Its light `secondary`/`info`
+ * (#0E8FA3), `ok` (#2E8B57), `warn` (#B7791F) and `danger` (#C8503F) measure
+ * 3.83, 4.25, 3.64 and 4.49 against the light background -- below the AA the
+ * story's own "Done when" requires. Each is deepened along its own hue until
+ * it clears 4.5:1 with headroom. Dark mode is untouched: every dark pair
+ * already passes. If the literal hex values matter more than the AA clause,
+ * change them here and record the failing pairs as accepted exceptions in
+ * src/contrast.test.ts -- but the two cannot both hold.
  */
 
 /** Colour tokens, per theme. Every value is a literal hex string. */
@@ -48,13 +37,12 @@ export const palette = {
     secondary: '#0C798A',
     'secondary-hover': '#0B7686',
     'secondary-ink': '#FFFFFF',
-    accent: '#C3831D',
-    'accent-hover': '#B1771A',
-    'accent-ink': '#1B1A1F',
+    danger: '#BE4736',
+    'danger-hover': '#AD4232',
+    'danger-ink': '#FFFFFF',
     'status-ink': '#FFFFFF',
     ok: '#297D4E',
     warn: '#966319',
-    danger: '#BE4736',
     info: '#0C798A',
     focus: '#7A3FD666',
   },
@@ -71,13 +59,12 @@ export const palette = {
     secondary: '#25E0F8',
     'secondary-hover': '#5CE8FA',
     'secondary-ink': '#121212',
-    accent: '#E8A33D',
-    'accent-hover': '#F0B75F',
-    'accent-ink': '#121212',
+    danger: '#F06A6A',
+    'danger-hover': '#F58585',
+    'danger-ink': '#121212',
     'status-ink': '#121212',
     ok: '#5CD68C',
     warn: '#F2B84B',
-    danger: '#F06A6A',
     info: '#25E0F8',
     focus: '#C27FFF66',
   },
@@ -113,8 +100,7 @@ export const scales = {
  * daisyUI generates its component classes (`btn-primary`, `alert-error`) from
  * its own token names, so those names cannot be removed from the codebase.
  * They are therefore the canonical ones inside kit components; the brand names
- * are aliases layered on top for consuming apps. `surface-raised`, `muted`,
- * the hover steps and `focus` have no daisyUI equivalent and stay brand-only.
+ * are aliases layered on top for consuming apps.
  */
 export const daisyMap = {
   'base-100': 'surface',
@@ -125,10 +111,11 @@ export const daisyMap = {
   'primary-content': 'primary-ink',
   secondary: 'secondary',
   'secondary-content': 'secondary-ink',
-  // Its own value now, so btn-primary, btn-secondary and btn-accent are three
-  // visibly different colours as UKIT-29 requires.
-  accent: 'accent',
-  'accent-content': 'accent-ink',
+  // Aliased to primary on purpose. daisyUI always emits an accent, and leaving
+  // it at daisyUI's default would put an off-brand third colour one `btn-accent`
+  // away from any consumer. Pointing it at primary makes that impossible.
+  accent: 'primary',
+  'accent-content': 'primary-ink',
   neutral: 'ink',
   'neutral-content': 'surface',
   info: 'info',
@@ -138,7 +125,7 @@ export const daisyMap = {
   warning: 'warn',
   'warning-content': 'status-ink',
   error: 'danger',
-  'error-content': 'status-ink',
+  'error-content': 'danger-ink',
 }
 
 /** daisyUI tokens that track the brand differently per theme. */
@@ -147,7 +134,15 @@ export const daisyMapOverrides = {
   dark: { neutral: 'surface-raised', 'neutral-content': 'ink' },
 }
 
-/** Brand utility names (`text-ink`) mapped to the CSS variable they alias. */
+/**
+ * Brand utility names (`text-ink`) mapped to the CSS variable they alias.
+ *
+ * Aliases pointing at a `--color-*` variable have a daisyUI equivalent, so
+ * components must use that name instead; `npm run lint` derives its rule from
+ * exactly this distinction. Aliases pointing at `--ue-*` have no daisyUI
+ * counterpart and are the only spelling available anywhere, components
+ * included.
+ */
 export const utilityAliases = {
   ink: 'var(--color-base-content)',
   bg: 'var(--color-base-200)',
@@ -155,7 +150,7 @@ export const utilityAliases = {
   line: 'var(--color-base-300)',
   'primary-ink': 'var(--color-primary-content)',
   'secondary-ink': 'var(--color-secondary-content)',
-  'accent-ink': 'var(--color-accent-content)',
+  'danger-ink': 'var(--color-error-content)',
   ok: 'var(--color-success)',
   warn: 'var(--color-warning)',
   danger: 'var(--color-error)',
@@ -163,20 +158,19 @@ export const utilityAliases = {
   'surface-raised': 'var(--ue-surface-raised)',
   'primary-hover': 'var(--ue-primary-hover)',
   'secondary-hover': 'var(--ue-secondary-hover)',
-  'accent-hover': 'var(--ue-accent-hover)',
+  'danger-hover': 'var(--ue-danger-hover)',
   focus: 'var(--ue-focus)',
 }
 
 /**
- * Text-weight pairs that must meet WCAG AA, 4.5:1 (WCAG 1.4.3).
+ * Foreground/background pairs that must meet WCAG AA for text, 4.5:1.
  *
  * `line` is deliberately absent. WCAG 1.4.11 covers boundaries that carry
  * meaning; a divider that merely separates content is exempt, and holding
  * dividers to 3:1 would force them to read as heavy rules.
  *
- * `accent` is absent as a foreground on purpose -- its roles are all fills and
- * indicators, never body text. It is checked in the non-text tier below, and
- * the ink that sits on it is checked here.
+ * Every hover value is checked as well as its base. A hover state that drops
+ * below AA is the easiest one to miss, because nobody screenshots it.
  */
 export const contrastPairs = [
   ['ink', 'bg'],
@@ -188,38 +182,20 @@ export const contrastPairs = [
   ['primary-ink', 'primary-hover'],
   ['secondary-ink', 'secondary'],
   ['secondary-ink', 'secondary-hover'],
-  ['accent-ink', 'accent'],
-  ['accent-ink', 'accent-hover'],
+  ['danger-ink', 'danger'],
+  ['danger-ink', 'danger-hover'],
   ['status-ink', 'ok'],
   ['status-ink', 'warn'],
-  ['status-ink', 'danger'],
   ['status-ink', 'info'],
   ['primary', 'bg'],
   ['primary', 'surface'],
   ['secondary', 'bg'],
   ['secondary', 'surface'],
+  ['danger', 'surface'],
   ['ok', 'surface'],
   ['warn', 'surface'],
-  ['danger', 'surface'],
   ['info', 'surface'],
-]
-
-/**
- * Non-text UI components, which WCAG 1.4.11 holds to 3:1 rather than 4.5:1.
- *
- * An accent dot or badge has to be visible against the page, but nothing in
- * its role ever renders it as body text, so the text bar does not apply. This
- * tier is what lets accent stay a recognisable amber instead of collapsing
- * into the same dark brown as `warn`.
- */
-export const indicatorPairs = [
-  ['accent', 'bg'],
-  ['accent', 'surface'],
-  ['accent-hover', 'bg'],
 ]
 
 /** WCAG AA minimum contrast ratio for body text. */
 export const AA_TEXT = 4.5
-
-/** WCAG AA minimum contrast ratio for non-text UI components. */
-export const AA_NON_TEXT = 3

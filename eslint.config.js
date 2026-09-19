@@ -2,14 +2,29 @@ import js from '@eslint/js'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
+import { utilityAliases } from './scripts/tokens.source.mjs'
 
 /**
- * Brand-named colour utilities (text-ink, bg-surface, border-line). They are
- * published for consuming apps, but inside unitykit's own components the
- * daisyUI names are canonical — see the rule below for why.
+ * Brand aliases that duplicate a daisyUI name, derived from the token source
+ * rather than listed here, so adding a token cannot silently escape the rule.
+ *
+ * Only aliases resolving to a `--color-*` variable qualify: those have a
+ * daisyUI spelling that components must use instead. Aliases resolving to
+ * `--ue-*` (muted, surface-raised, the hover steps, focus) have no daisyUI
+ * counterpart and are the only spelling that exists, so components have to be
+ * allowed to use them.
  */
-const BRAND_UTILITY =
-  '/(^|[ ])(text|bg|border|ring|outline|fill|stroke|divide|from|via|to)-(ink|muted|surface-raised|surface|line|ok|warn|danger|primary-ink|primary-hover|secondary-ink|focus)([ ]|[/]|$)/'
+const duplicated = Object.entries(utilityAliases)
+  .filter(([, value]) => value.includes('--color-'))
+  .map(([name]) => name)
+  // Longest first, so surface-raised cannot be shadowed by surface.
+  .sort((a, b) => b.length - a.length)
+
+// Written without backslash escapes on purpose: they do not survive being
+// generated through a shell, and a silently mangled regex here would disable
+// the rule without failing anything.
+const PREFIXES = 'text|bg|border|ring|outline|fill|stroke|divide|from|via|to'
+const BRAND_UTILITY = `/(^|[ ])(${PREFIXES})-(${duplicated.join('|')})([ ]|[/]|$)/`
 
 export default tseslint.config(
   { ignores: ['dist', 'storybook-static', 'coverage', 'node_modules'] },

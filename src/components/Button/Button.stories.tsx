@@ -19,7 +19,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'inline-radio',
-      options: ['primary', 'secondary', 'accent'],
+      options: ['primary', 'secondary', 'danger'],
       description: 'daisyUI colour variant.',
     },
     disabled: { control: 'boolean' },
@@ -37,7 +37,8 @@ export const Primary: Story = { args: { variant: 'primary' } }
 
 export const Secondary: Story = { args: { variant: 'secondary' } }
 
-export const Accent: Story = { args: { variant: 'accent' } }
+/** Destructive actions: delete, remove, revoke, end, leave call. */
+export const Danger: Story = { args: { variant: 'danger', children: 'Delete' } }
 
 export const Disabled: Story = { args: { disabled: true } }
 
@@ -51,8 +52,8 @@ export const AllVariants: Story = {
       <Button {...args} variant="secondary">
         Secondary
       </Button>
-      <Button {...args} variant="accent">
-        Accent
+      <Button {...args} variant="danger">
+        Danger
       </Button>
       <Button {...args} disabled>
         Disabled

@@ -10,7 +10,7 @@
 export type ThemeName = 'light' | 'dark'
 
 /** Every colour token, in both themes. */
-export type ColorToken = 'bg' | 'surface' | 'surface-raised' | 'line' | 'ink' | 'muted' | 'primary' | 'primary-hover' | 'primary-ink' | 'secondary' | 'secondary-hover' | 'secondary-ink' | 'accent' | 'accent-hover' | 'accent-ink' | 'status-ink' | 'ok' | 'warn' | 'danger' | 'info' | 'focus'
+export type ColorToken = 'bg' | 'surface' | 'surface-raised' | 'line' | 'ink' | 'muted' | 'primary' | 'primary-hover' | 'primary-ink' | 'secondary' | 'secondary-hover' | 'secondary-ink' | 'danger' | 'danger-hover' | 'danger-ink' | 'status-ink' | 'ok' | 'warn' | 'info' | 'focus'
 
 /**
  * The brand palette as literal hex strings, for anything that cannot use a CSS
@@ -31,13 +31,12 @@ export const tokens: Record<ThemeName, Record<ColorToken, string>> = {
     secondary: '#0C798A',
     'secondary-hover': '#0B7686',
     'secondary-ink': '#FFFFFF',
-    accent: '#C3831D',
-    'accent-hover': '#B1771A',
-    'accent-ink': '#1B1A1F',
+    danger: '#BE4736',
+    'danger-hover': '#AD4232',
+    'danger-ink': '#FFFFFF',
     'status-ink': '#FFFFFF',
     ok: '#297D4E',
     warn: '#966319',
-    danger: '#BE4736',
     info: '#0C798A',
     focus: '#7A3FD666',
   },
@@ -54,13 +53,12 @@ export const tokens: Record<ThemeName, Record<ColorToken, string>> = {
     secondary: '#25E0F8',
     'secondary-hover': '#5CE8FA',
     'secondary-ink': '#121212',
-    accent: '#E8A33D',
-    'accent-hover': '#F0B75F',
-    'accent-ink': '#121212',
+    danger: '#F06A6A',
+    'danger-hover': '#F58585',
+    'danger-ink': '#121212',
     'status-ink': '#121212',
     ok: '#5CD68C',
     warn: '#F2B84B',
-    danger: '#F06A6A',
     info: '#25E0F8',
     focus: '#C27FFF66',
   },
@@ -130,35 +128,20 @@ export const contrastPairs: ReadonlyArray<readonly [ColorToken, ColorToken]> = [
   ['primary-ink', 'primary-hover'],
   ['secondary-ink', 'secondary'],
   ['secondary-ink', 'secondary-hover'],
-  ['accent-ink', 'accent'],
-  ['accent-ink', 'accent-hover'],
+  ['danger-ink', 'danger'],
+  ['danger-ink', 'danger-hover'],
   ['status-ink', 'ok'],
   ['status-ink', 'warn'],
-  ['status-ink', 'danger'],
   ['status-ink', 'info'],
   ['primary', 'bg'],
   ['primary', 'surface'],
   ['secondary', 'bg'],
   ['secondary', 'surface'],
+  ['danger', 'surface'],
   ['ok', 'surface'],
   ['warn', 'surface'],
-  ['danger', 'surface'],
   ['info', 'surface'],
-]
-
-/**
- * Pairs held to the non-text bar instead. WCAG 1.4.11 applies 3:1 to UI
- * components and graphical objects, which is what an indicator dot or a badge
- * fill is; body text is the stricter 1.4.3 list above.
- */
-export const indicatorPairs: ReadonlyArray<readonly [ColorToken, ColorToken]> = [
-  ['accent', 'bg'],
-  ['accent', 'surface'],
-  ['accent-hover', 'bg'],
 ]
 
 /** WCAG AA minimum contrast ratio for body text. */
 export const AA_TEXT = 4.5
-
-/** WCAG AA minimum contrast ratio for non-text UI components. */
-export const AA_NON_TEXT = 3

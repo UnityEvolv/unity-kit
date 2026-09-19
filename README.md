@@ -101,28 +101,30 @@ tokens the CSS is generated from. A colour that breaks it fails the pull request
 `Foundations/Tokens` Storybook page renders every ratio from the same functions — it is
 the readable view, not the check.
 
-Two tiers, because WCAG has two: **4.5:1 for text** (WCAG 1.4.3), and **3:1 for non-text UI
-components** (1.4.11) such as indicator dots, badge fills and chart series. `accent` sits
-in the second tier — it is never rendered as body text, and holding it to the text bar
-would force it dark enough to be indistinguishable from `warn`.
+Every hover value is checked alongside its base, because a hover state that drops below AA
+is the easiest one to miss — nobody screenshots it.
 
 Light-mode values are deeper than the raw brand palette. `#25E0F8` cyan measures 1.6:1 on
 white and `#C27FFF` lavender 2.1:1, so neither can carry text in light mode; the brand is
 dark-first. The light theme uses deepened partners of the same hue, and dark mode uses the
 brand values unchanged.
 
-`line` is exempt from both tiers by design: WCAG 1.4.11 covers boundaries that carry
-meaning, not dividers that merely separate content.
+`line` is exempt by design: WCAG 1.4.11 covers boundaries that carry meaning, not dividers
+that merely separate content.
 
-### The three voices
+### Two hues, and no accent
 
-`primary` carries actions, `secondary` is the second voice (links, active speaker, status),
-and `accent` is attention that is not an action — a raised hand, an unread mention, a
-recording indicator, a chart's second series. `accent` is never a button's default colour.
+`primary` carries actions — buttons, join, the selected item, the focus ring. `secondary`
+is the second voice: links, the active speaker, the in-a-call status, and anything that
+needs attention without being an action, such as a raised hand or an unread mention.
+`danger` is a real button variant rather than only a status colour, with its own hover and
+ink so a destructive button is as finished as a primary one.
 
-`accent` and `warn` share a hue, so they are separated by lightness rather than colour, and
-a test pins that separation. It works, but a mention badge and a warning can still look
-alike; a genuinely distinct third voice would need a different hue family.
+There is no third hue. Any accent dark enough to carry white text at AA lands in the warm
+band already held by `warn` and `danger` — measured with CIEDE2000, amber at that lightness
+is ΔE 1.7 from `warn`, which is the same colour. daisyUI always emits an accent, so
+`--color-accent` is aliased to primary and `btn-accent` can never introduce one; a test
+asserts that alias against the generated theme.
 
 ## Local development
 

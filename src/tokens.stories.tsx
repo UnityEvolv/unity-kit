@@ -1,15 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { contrastRatio, meetsAA } from './contrast'
-import {
-  AA_NON_TEXT,
-  AA_TEXT,
-  contrastPairs,
-  indicatorPairs,
-  scales,
-  tokens,
-  type ColorToken,
-  type ThemeName,
-} from './tokens'
+import { AA_TEXT, contrastPairs, scales, tokens, type ColorToken, type ThemeName } from './tokens'
 
 /**
  * Every number on this page is computed from the same `tokens` object the CSS
@@ -138,18 +129,17 @@ export const Palette: Story = {
 }
 
 /**
- * Contrast for every pair, computed at render time, at the bar that actually
- * applies to it. `line` is absent from both tiers by design: WCAG 1.4.11
- * covers boundaries that carry meaning, and holding a plain divider to 3:1
- * would force it to read as a heavy rule.
+ * Contrast for every text-weight pair, computed at render time. `line` is
+ * absent by design: WCAG 1.4.11 covers boundaries that carry meaning, and
+ * holding a plain divider to 3:1 would force it to read as a heavy rule.
  */
 export const Contrast: Story = {
   render: () => (
     <div className="p-4">
       <p className="mb-4 max-w-3xl text-sm opacity-70">
-        Computed with WCAG 2.1 relative luminance. Body text is held to {AA_TEXT}:1 (WCAG
-        1.4.3); indicators and badge fills to {AA_NON_TEXT}:1 (1.4.11), because nothing in
-        their role renders them as text. These same pairs are asserted in{' '}
+        Computed with WCAG 2.1 relative luminance; AA for text and button labels is{' '}
+        {AA_TEXT}:1. Every hover value is checked as well as its base, since a hover state
+        that drops below AA is the easiest one to miss. These same pairs are asserted in{' '}
         <code>src/contrast.test.ts</code>, so a failure here is a failed build, not a note on
         a page.
       </p>
@@ -160,16 +150,8 @@ export const Contrast: Story = {
               theme={theme}
               pairs={contrastPairs}
               minimum={AA_TEXT}
-              caption="Text"
+              caption="Text and button labels"
             />
-            <div className="mt-6">
-              <ContrastTable
-                theme={theme}
-                pairs={indicatorPairs}
-                minimum={AA_NON_TEXT}
-                caption="Non-text UI"
-              />
-            </div>
           </Panel>
         ))}
       </div>

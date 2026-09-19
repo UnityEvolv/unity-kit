@@ -38,8 +38,8 @@
   --color-primary-content: #FFFFFF;
   --color-secondary: #0C798A;
   --color-secondary-content: #FFFFFF;
-  --color-accent: #C3831D;
-  --color-accent-content: #1B1A1F;
+  --color-accent: #7A3FD6;
+  --color-accent-content: #FFFFFF;
   --color-neutral: #1B1A1F;
   --color-neutral-content: #FFFFFF;
   --color-info: #0C798A;
@@ -64,13 +64,12 @@
   --ue-secondary: #0C798A;
   --ue-secondary-hover: #0B7686;
   --ue-secondary-ink: #FFFFFF;
-  --ue-accent: #C3831D;
-  --ue-accent-hover: #B1771A;
-  --ue-accent-ink: #1B1A1F;
+  --ue-danger: #BE4736;
+  --ue-danger-hover: #AD4232;
+  --ue-danger-ink: #FFFFFF;
   --ue-status-ink: #FFFFFF;
   --ue-ok: #297D4E;
   --ue-warn: #966319;
-  --ue-danger: #BE4736;
   --ue-info: #0C798A;
   --ue-focus: #7A3FD666;
 
@@ -93,7 +92,7 @@
   --color-primary-content: #121212;
   --color-secondary: #25E0F8;
   --color-secondary-content: #121212;
-  --color-accent: #E8A33D;
+  --color-accent: #C27FFF;
   --color-accent-content: #121212;
   --color-neutral: #26242C;
   --color-neutral-content: #FFFFFF;
@@ -119,13 +118,12 @@
   --ue-secondary: #25E0F8;
   --ue-secondary-hover: #5CE8FA;
   --ue-secondary-ink: #121212;
-  --ue-accent: #E8A33D;
-  --ue-accent-hover: #F0B75F;
-  --ue-accent-ink: #121212;
+  --ue-danger: #F06A6A;
+  --ue-danger-hover: #F58585;
+  --ue-danger-ink: #121212;
   --ue-status-ink: #121212;
   --ue-ok: #5CD68C;
   --ue-warn: #F2B84B;
-  --ue-danger: #F06A6A;
   --ue-info: #25E0F8;
   --ue-focus: #C27FFF66;
 
@@ -151,7 +149,7 @@
   --color-line: var(--color-base-300);
   --color-primary-ink: var(--color-primary-content);
   --color-secondary-ink: var(--color-secondary-content);
-  --color-accent-ink: var(--color-accent-content);
+  --color-danger-ink: var(--color-error-content);
   --color-ok: var(--color-success);
   --color-warn: var(--color-warning);
   --color-danger: var(--color-error);
@@ -159,7 +157,7 @@
   --color-surface-raised: var(--ue-surface-raised);
   --color-primary-hover: var(--ue-primary-hover);
   --color-secondary-hover: var(--ue-secondary-hover);
-  --color-accent-hover: var(--ue-accent-hover);
+  --color-danger-hover: var(--ue-danger-hover);
   --color-focus: var(--ue-focus);
 }
 
