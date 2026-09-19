@@ -80,6 +80,29 @@ export default tseslint.config(
     },
   },
   {
+    // The Icon component is the kit's only door to an icon library. Keeping
+    // every other file off lucide-react is what makes swapping libraries later
+    // one table rather than an edit everywhere an icon appears — and it is the
+    // rule consuming apps inherit the benefit of, since they only ever see
+    // <Icon name="..." />.
+    files: ['src/**/*.{ts,tsx}', '.storybook/**/*.{ts,tsx}'],
+    ignores: ['src/components/Icon/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'lucide-react',
+              message:
+                'Import { Icon } from the kit instead. Icons are named in src/components/Icon/icons.ts so the library can be swapped in one file.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Build config and scripts run in Node, not the browser.
     files: ['vite.config.ts', '.storybook/**/*.ts', 'scripts/**/*.mjs'],
     languageOptions: { globals: globals.node },

@@ -126,6 +126,113 @@ is ΔE 1.7 from `warn`, which is the same colour. daisyUI always emits an accent
 `--color-accent` is aliased to primary and `btn-accent` can never introduce one; a test
 asserts that alias against the generated theme.
 
+## Icons
+
+One component, so no app ever imports an icon library directly.
+
+```tsx
+import { Icon } from '@unityevolv/unitykit'
+
+<Icon name="mic" />                              // 20px, decorative
+<Icon name="lock" size="sm" />                   // 16px
+<Icon name="record" title="Recording" />         // labelled for screen readers
+```
+
+Names are the kit's own, not the library's — `share`, not `monitor-up`; `record`, not
+`circle-dot`. They are typed as a union, so an unknown name is a compile error rather than
+a blank space. The mapping lives in one table in `src/components/Icon/icons.ts`, the only
+file in the repository that names a Lucide component; swapping libraries later is that
+file rather than every call site. `npm run lint` fails a direct `lucide-react` import
+anywhere else.
+
+Sizes match the type scale: `xs` 14, `sm` 16, `md` 20 (default), `lg` 24, `xl` 32. There is
+no numeric size prop — anything larger than 32 is an illustration, not an icon, and the
+union is what keeps that true.
+
+**Colour always comes from `currentColor`.** An icon never sets its own, so it inherits
+from the text around it and every theme and token works without the icon knowing they
+exist. Colour a parent, not the icon.
+
+### Icons in components
+
+Components take an icon as a **prop**, not as a child. The component picks the size, the
+placement and the shape, so a caller never writes a daisyUI class name or guesses at
+pixel sizes:
+
+```tsx
+<Button icon="invite">Invite</Button>
+<Button icon="chevron-right" iconPosition="end">Next</Button>
+<Button icon="trash" variant="danger" aria-label="Delete" />   // icon-only
+```
+
+An icon-only button with no accessible name **does not compile**. The icon is
+`aria-hidden`, so the button would have nothing to announce; the type requires
+`aria-label` on that shape:
+
+```tsx
+<Button icon="trash" />   // Property 'aria-label' is missing
+```
+
+### Labelling
+
+An icon is decorative by default: `aria-hidden`, and out of the tab order. A button takes
+its name from its own label, so giving the icon a `title` as well makes a screen reader
+announce the same thing twice. Reach for `title` only when an icon stands alone and
+carries meaning:
+
+```tsx
+<Icon name="record" title="Recording" />   // standalone and meaningful
+```
+
+### The custom set
+
+Six icons are drawn here because Lucide has no equivalent, or none in the right sense:
+`knock`, `raise-hand`, `reception`, `break-room`, `office`, `provider`. They use the same
+24px viewBox, 2px stroke and round caps Lucide emits, so they sit beside it without looking
+foreign — the `Primitives/Icon` Storybook page shows them next to Lucide icons at the same
+size, which is the fastest way to spot one that does not.
+
+Nothing ships with an emoji as an icon. Emoji render differently on every platform and
+cannot take a colour.
+
+## Brand
+
+A product's identity — the monogram, then the product name in two tones, the way
+unityevolv.com writes it.
+
+```tsx
+import { Brand } from '@unityevolv/unitykit'
+
+<Brand product="unityofis" href="/" />     // a navbar brand link
+<Brand product="ofiskit" size="lg" />
+<Brand product="unityevolv" markOnly />    // collapsed sidebars
+```
+
+Three products today: `unityevolv` (UE mark, **Unity**Evolv), `unityofis` (UO mark,
+**unity**ofis) and `ofiskit` (UO mark, **ofis**kit — the engine carries the product's
+mark rather than earning its own). Adding another is one row in the table inside the
+component.
+
+Sizes set the mark height and the name scales with it: `sm` 24px, `md` 30px, `lg` 40px.
+The first word takes the secondary tone and the second the primary, from the theme — so
+light mode gets the deepened shades and dark mode the brand values, with no
+per-product colour anywhere.
+
+**The whole thing is announced once**, as the product name. The two-tone split is
+decoration, not information, so the pieces are hidden and the link or span carries the
+full name — a screen reader reads `unityofis`, not "unity, ofis". With `href` it is one
+link; without, a labelled image.
+
+The marks are also exported on their own as `<UEMark />` and `<UOMark />`, for anywhere
+the wordmark is too much. Generate favicons from these per app at build time rather than
+rendering `Brand` into one.
+
+> **The marks are placeholder artwork.** They are geometric letterforms built to the
+> right proportions and colour split, not the real logo — the website ships its mark as a
+> PNG, which cannot be traced into something faithful. Replace the paths in
+> `src/components/Brand/marks.tsx` when the vector artwork exists; nothing outside that
+> file changes, because `Brand` only ever asks for a mark at a height.
+
 ## Local development
 
 ```bash
@@ -164,17 +271,33 @@ workspace installs both resolve packages the kit never declared.
 
 It renders every exported component, collects the class names they emit, and requires each
 one to resolve to a non-empty rule in the app's compiled CSS. New components are covered
-automatically, with no per-component setup.
+automatically — a component whose props are all optional needs no setup at all.
+
+A component with a **required** prop declares one valid set, because the test renders
+blind and has no way to know:
+
+```tsx
+Icon.sampleProps = { name: 'mic' } satisfies IconProps
+```
+
+Without it the test fails by name and tells you to add one, rather than skipping the
+component — skipping would quietly drop the component most likely to have a packaging
+problem.
 
 That fails the build on:
 
 - **an undeclared runtime dependency** — npm's flat `node_modules` resolves these locally
   and then fails for consumers on a clean install
 - **a missing `@source` line**, which stops Tailwind scanning the kit entirely
+- **any component that throws from a clean install**, reported by export name
 
-It does *not* catch a class name assembled from a variable; daisyUI emits its modifier
-rules whenever the base component class is present, so the CSS exists either way. `npm run
-lint` guards that instead.
+Two things it does *not* catch:
+
+- **A class name assembled from a variable.** daisyUI emits its modifier rules whenever the
+  base component class is present, so the CSS exists either way. `npm run lint` guards that.
+- **Marker classes.** Lucide stamps `lucide lucide-mic` on every icon; those are hooks, not
+  styling, and are skipped by an explicit list in the script. An ignored class is an
+  unchecked class, so that list should stay as short as it can be.
 
 Use `npm run blind-test -- --keep` to leave the generated app in place for inspection.
 
