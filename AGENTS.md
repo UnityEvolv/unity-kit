@@ -180,6 +180,32 @@ Leave it off and the test fails by name asking for it. It does not skip the comp
 because skipping would drop the one whose real risk — an undeclared dependency on the icon
 library — is exactly what that test exists to catch.
 
+## Alerts
+
+`Alert` is a message that belongs on the page. `Toast` (UKIT-8) is transient feedback
+about something that already happened. If it is still true after a reload, it is an
+alert.
+
+- **Urgency is part of the variant, not a separate prop.** `warn` and `danger` render
+  `role="alert"`, which is assertive and interrupts a screen reader mid-sentence;
+  `info` and `ok` render `role="status"`, which waits. Anything added later that speaks
+  makes the same choice deliberately rather than defaulting to `alert` because it is
+  the more familiar word.
+- **Colour never carries a difference on its own.** WCAG 1.4.1. `warn` and `danger`
+  draw different glyphs, which is why `icons.ts` gained an `error` row: `alert` was
+  already the warning triangle, and one picture in two colours is not a distinction.
+  A test asserts all four variants render different SVG, so adding a fifth that reuses
+  a glyph fails the build.
+- **The kit never remembers a dismissal.** `onDismiss` fires and the alert stays on
+  screen. Whether a notice returns on the next load is a product decision, and a
+  component that hides itself cannot be brought back without a re-render the app did
+  not ask for. The same rule applies to anything dismissible added later.
+- **`banner` is a prop, not a second component.** A `Banner` would be an `Alert` with
+  two class names changed, and a second name for one thing drifts.
+- **The title is a `p`, and there is no `titleAs`.** Unlike `EmptyState`, which replaces
+  a region's content and may need a heading, an alert is a notice inside a region that
+  already has one. Adding a prop nobody needs is worse than the inconsistency.
+
 ## Brand
 
 `Brand` renders a product's identity: the monogram, then the name split across the
@@ -195,6 +221,82 @@ one is a row and nothing else.
   rather than reading two fragments. Keep it that way when adding a product.
 - `ofiskit` shares the UO mark with `unityofis` on purpose: the engine carries the
   product's mark rather than earning a third one.
+
+## Loading and empty states
+
+`Spinner`, `Skeleton`, `Progress` and `EmptyState` cover waiting and nothing-here. Reach
+for `Progress` when the extent is known, `Spinner` when it is not, `Skeleton` when the
+shape of the answer is, and `EmptyState` when the wait is over and there is nothing to
+show.
+
+- **A live region is announced by its contents, not its accessible name.** `Spinner` is
+  `role="status"`; that role takes no name from what it contains, and an empty one
+  carrying only an `aria-label` announces nothing in most screen readers. A spinner with
+  no visible label therefore holds `sr-only` text. Any live region added later follows
+  the same rule — put the words inside it.
+- **`Skeleton` is `aria-hidden`, and the container carries `aria-busy`.** Reading grey
+  bars aloud is worse than silence, and the region being filled is the thing that knows
+  what is loading. Do not add a label to a skeleton to "fix" its silence.
+- **Indeterminate is the absence of a value, not a prop.** `Progress` is a native
+  `<progress>`; omitting `value` is what the platform and daisyUI both read as
+  indeterminate. `value={0}` is a bar that has not started, which is a different
+  statement. Out-of-range values are clamped.
+- **`EmptyState` renders its title as a `p` and takes `titleAs` for a level.** Heading
+  level belongs to the page. It is an element name rather than a node because HTML
+  forbids a heading inside a paragraph.
+- **Reduced motion comes from daisyUI**, which already confines both the spinner and the
+  skeleton animations to `prefers-reduced-motion: no-preference`. Do not stack a
+  `motion-reduce:` variant on top. `Spinner.test.tsx` and `Skeleton.test.tsx` read
+  daisyUI's shipped CSS and assert it still holds, because a dependency is satisfying an
+  accessibility promise the kit makes in its own name.
+- **One place knows how a spinner is drawn.** `Button` imports `spinnerClass` from
+  `Spinner` rather than repeating `loading loading-spinner`, and deliberately does not
+  nest the component: the button is already `aria-busy`, and a `role="status"` inside it
+  would announce the same state twice. `spinnerClass` is not exported from the package —
+  it hands out daisyUI class names, which a consumer should never hold.
+
+## Cards and stats
+
+`Card` is a frame and nothing else: radius, surface, border, padding, and where the
+header, footer and media sit. What goes inside each slot is the consuming app's, which
+is why the body is a plain `children` slot rather than a set of sub-components.
+
+- **Charts are deliberately not in the kit.** An app renders its own chart inside a Card.
+  Shipping one would mean picking a charting library for every consumer and owning its
+  theming, and the Card already gives the chart its frame.
+- **The slots are props, not sub-components** — `header`, `footer`, `media` — for the same
+  reason `Button` takes an icon as a prop. The kit owns which daisyUI class each slot gets
+  (`card-title`, `card-actions`, `figure`) so a consumer never writes one. It does not own
+  the heading level: pass a heading element into `header` when the card titles a section.
+- **`interactive` is bordered plus a hover and a focus ring.** `href` renders the card as
+  an anchor, which is what makes a whole-card link focusable and keyboard-activatable
+  without hand-rolling either, and it turns the affordance on whichever variant is chosen.
+  Apps on a client-side router use `variant="interactive"` and supply their own link — the
+  kit is router-agnostic and will not import one.
+
+Three daisyUI defaults are deliberately overridden, and each would be a silent bug if
+restored:
+
+- **`.card` and `.stats` set no background.** daisyUI gives them a radius and a layout
+  only, so both components add `bg-base-100`. Without it a card is invisible on the page
+  background apart from its border.
+- **`.card-border` draws in `base-200`**, which is `#FAF8FC` against a `#FFFFFF` surface
+  in light mode — a border nobody can see. `border-base-300` is the kit's line token.
+- **`.stat-title` and `.stat-desc` are `base-content` at 60%**, the exact composite
+  AGENTS.md warns about elsewhere: roughly 4.1:1 on the dark background, below AA. Both
+  get the `muted` token instead, which `src/contrast.test.ts` measures in both themes.
+
+`Stat` separates **direction** from **tone**. Direction picks the arrow; tone picks the
+colour, defaulting from direction. Up is not always good news — dropped calls, latency
+and cost all read the other way — so a metric where rising is bad keeps the arrow pointing
+up and sets `tone="negative"`. The arrow also means the delta does not rely on colour
+alone to be understood.
+
+`StatGroup` stacks below `sm` and sits in a row above it by default. daisyUI's `.stats` is
+a grid with `grid-auto-flow: column`: it scrolls horizontally rather than wrapping, so on a
+phone a row of metrics runs off the edge instead of reflowing. Stacking is daisyUI's own
+answer and it is the default here so a dashboard row survives a narrow viewport without
+the consumer thinking about it; `horizontal` and `vertical` pin it.
 
 ## Overlays
 
@@ -243,6 +345,7 @@ should get Radix's own button rather than a crash.
 Without them Radix's positioning throws a `TypeError` and an overlay test fails for
 reasons that have nothing to do with the overlay. Those stubs report no geometry on
 purpose: assert behaviour and markup, never where a panel landed on screen.
+
 
 ## Styling conventions
 

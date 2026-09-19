@@ -3,6 +3,8 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Icon } from '../Icon'
 import type { IconName, IconSize } from '../Icon'
+import { spinnerClass } from '../Spinner/Spinner'
+import type { SpinnerSize } from '../Spinner/Spinner'
 
 /**
  * Every class name appears here in full. Tailwind scans built files as static
@@ -50,11 +52,11 @@ export type ButtonSize = NonNullable<ButtonVariants['size']>
  * when it is a step above the text rather than matched to the button height.
  */
 const glyphSize: Record<ButtonSize, IconSize> = { xs: 'xs', sm: 'xs', md: 'sm', lg: 'md' }
-const spinnerSize: Record<ButtonSize, string> = {
-  xs: 'loading-xs',
-  sm: 'loading-xs',
-  md: 'loading-sm',
-  lg: 'loading-md',
+const spinnerSize: Record<ButtonSize, SpinnerSize> = {
+  xs: 'xs',
+  sm: 'xs',
+  md: 'sm',
+  lg: 'md',
 }
 
 /**
@@ -118,7 +120,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   // A spinner replaces the icon rather than joining it, so the button does not
   // change width mid-action and shift whatever sits beside it.
   const glyph = loading ? (
-    <span className={['loading loading-spinner', spinnerSize[size]].join(' ')} aria-hidden="true" />
+    // The class names come from Spinner, so one place in the kit knows how
+    // a spinner is drawn. The component itself is deliberately not used here:
+    // it is a role="status" live region and the button is already aria-busy,
+    // so nesting one would announce the same state twice.
+    <span className={spinnerClass(spinnerSize[size])} aria-hidden="true" />
   ) : icon ? (
     <Icon name={icon} size={glyphSize[size]} />
   ) : null
