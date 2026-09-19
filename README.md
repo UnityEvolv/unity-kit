@@ -195,6 +195,44 @@ size, which is the fastest way to spot one that does not.
 Nothing ships with an emoji as an icon. Emoji render differently on every platform and
 cannot take a colour.
 
+## Brand
+
+A product's identity — the monogram, then the product name in two tones, the way
+unityevolv.com writes it.
+
+```tsx
+import { Brand } from '@unityevolv/unitykit'
+
+<Brand product="unityofis" href="/" />     // a navbar brand link
+<Brand product="ofiskit" size="lg" />
+<Brand product="unityevolv" markOnly />    // collapsed sidebars
+```
+
+Three products today: `unityevolv` (UE mark, **Unity**Evolv), `unityofis` (UO mark,
+**unity**ofis) and `ofiskit` (UO mark, **ofis**kit — the engine carries the product's
+mark rather than earning its own). Adding another is one row in the table inside the
+component.
+
+Sizes set the mark height and the name scales with it: `sm` 24px, `md` 30px, `lg` 40px.
+The first word takes the secondary tone and the second the primary, from the theme — so
+light mode gets the deepened shades and dark mode the brand values, with no
+per-product colour anywhere.
+
+**The whole thing is announced once**, as the product name. The two-tone split is
+decoration, not information, so the pieces are hidden and the link or span carries the
+full name — a screen reader reads `unityofis`, not "unity, ofis". With `href` it is one
+link; without, a labelled image.
+
+The marks are also exported on their own as `<UEMark />` and `<UOMark />`, for anywhere
+the wordmark is too much. Generate favicons from these per app at build time rather than
+rendering `Brand` into one.
+
+> **The marks are placeholder artwork.** They are geometric letterforms built to the
+> right proportions and colour split, not the real logo — the website ships its mark as a
+> PNG, which cannot be traced into something faithful. Replace the paths in
+> `src/components/Brand/marks.tsx` when the vector artwork exists; nothing outside that
+> file changes, because `Brand` only ever asks for a mark at a height.
+
 ## Local development
 
 ```bash
