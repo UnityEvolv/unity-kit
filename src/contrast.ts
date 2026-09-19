@@ -45,7 +45,15 @@ export function contrastRatio(foreground: string, background: string): number {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
 }
 
-/** Whether a pair meets WCAG AA for body text (4.5:1). */
-export function meetsAA(foreground: string, background: string): boolean {
-  return contrastRatio(foreground, background) >= 4.5
+/**
+ * Whether a pair meets WCAG AA at the given bar.
+ *
+ * The default is 4.5:1, which WCAG 1.4.3 requires of body text. Pass 3 for a
+ * non-text UI component or graphical object, which 1.4.11 holds to the lower
+ * bar — an indicator dot, a badge fill, a chart series. Using the text figure
+ * for those is not "safer": it forces every indicator dark enough that hues
+ * stop being distinguishable from one another.
+ */
+export function meetsAA(foreground: string, background: string, minimum = 4.5): boolean {
+  return contrastRatio(foreground, background) >= minimum
 }

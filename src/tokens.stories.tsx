@@ -1,6 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { contrastRatio, meetsAA } from './contrast'
-import { AA_TEXT, contrastPairs, scales, tokens, type ColorToken, type ThemeName } from './tokens'
+import {
+  AA_NON_TEXT,
+  AA_TEXT,
+  contrastPairs,
+  indicatorPairs,
+  scales,
+  tokens,
+  type ColorToken,
+  type ThemeName,
+} from './tokens'
 
 /**
  * Every number on this page is computed from the same `tokens` object the CSS
@@ -45,9 +54,22 @@ function Swatches({ theme }: { theme: ThemeName }) {
   )
 }
 
-function ContrastTable({ theme }: { theme: ThemeName }) {
+function ContrastTable({
+  theme,
+  pairs,
+  minimum,
+  caption,
+}: {
+  theme: ThemeName
+  pairs: ReadonlyArray<readonly [ColorToken, ColorToken]>
+  minimum: number
+  caption: string
+}) {
   return (
     <table className="w-full text-sm">
+      <caption className="pb-2 text-left text-xs opacity-60">
+        {caption} — {minimum}:1
+      </caption>
       <thead>
         <tr className="text-left opacity-60">
           <th className="pb-2 font-normal">Pair</th>
@@ -56,10 +78,10 @@ function ContrastTable({ theme }: { theme: ThemeName }) {
         </tr>
       </thead>
       <tbody>
-        {contrastPairs.map(([foreground, background]) => {
+        {pairs.map(([foreground, background]) => {
           const fg = tokens[theme][foreground]
           const bg = tokens[theme][background]
-          const passes = meetsAA(fg, bg)
+          const passes = meetsAA(fg, bg, minimum)
           return (
             <tr key={foreground + background} className="border-t border-base-300">
               <td className="py-1.5">
@@ -116,22 +138,38 @@ export const Palette: Story = {
 }
 
 /**
- * Contrast for every text-weight pair, computed at render time. `line` is
- * absent by design: WCAG 1.4.11 covers boundaries that carry meaning, and
- * holding a plain divider to 3:1 would force it to read as a heavy rule.
+ * Contrast for every pair, computed at render time, at the bar that actually
+ * applies to it. `line` is absent from both tiers by design: WCAG 1.4.11
+ * covers boundaries that carry meaning, and holding a plain divider to 3:1
+ * would force it to read as a heavy rule.
  */
 export const Contrast: Story = {
   render: () => (
     <div className="p-4">
-      <p className="mb-4 text-sm opacity-70">
-        Computed with WCAG 2.1 relative luminance. AA for body text is {AA_TEXT}:1. These same
-        pairs are asserted in <code>src/contrast.test.ts</code>, so a failure here is a failed
-        build, not a note on a page.
+      <p className="mb-4 max-w-3xl text-sm opacity-70">
+        Computed with WCAG 2.1 relative luminance. Body text is held to {AA_TEXT}:1 (WCAG
+        1.4.3); indicators and badge fills to {AA_NON_TEXT}:1 (1.4.11), because nothing in
+        their role renders them as text. These same pairs are asserted in{' '}
+        <code>src/contrast.test.ts</code>, so a failure here is a failed build, not a note on
+        a page.
       </p>
       <div className="flex gap-4">
         {themes.map((theme) => (
           <Panel key={theme} theme={theme}>
-            <ContrastTable theme={theme} />
+            <ContrastTable
+              theme={theme}
+              pairs={contrastPairs}
+              minimum={AA_TEXT}
+              caption="Text"
+            />
+            <div className="mt-6">
+              <ContrastTable
+                theme={theme}
+                pairs={indicatorPairs}
+                minimum={AA_NON_TEXT}
+                caption="Non-text UI"
+              />
+            </div>
           </Panel>
         ))}
       </div>

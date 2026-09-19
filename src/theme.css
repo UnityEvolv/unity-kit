@@ -38,15 +38,15 @@
   --color-primary-content: #FFFFFF;
   --color-secondary: #0C798A;
   --color-secondary-content: #FFFFFF;
-  --color-accent: #0C798A;
-  --color-accent-content: #FFFFFF;
+  --color-accent: #C3831D;
+  --color-accent-content: #1B1A1F;
   --color-neutral: #1B1A1F;
   --color-neutral-content: #FFFFFF;
   --color-info: #0C798A;
   --color-info-content: #FFFFFF;
   --color-success: #297D4E;
   --color-success-content: #FFFFFF;
-  --color-warning: #97641A;
+  --color-warning: #966319;
   --color-warning-content: #FFFFFF;
   --color-error: #BE4736;
   --color-error-content: #FFFFFF;
@@ -62,10 +62,14 @@
   --ue-primary-hover: #6A33BF;
   --ue-primary-ink: #FFFFFF;
   --ue-secondary: #0C798A;
+  --ue-secondary-hover: #0B7686;
   --ue-secondary-ink: #FFFFFF;
+  --ue-accent: #C3831D;
+  --ue-accent-hover: #B1771A;
+  --ue-accent-ink: #1B1A1F;
   --ue-status-ink: #FFFFFF;
   --ue-ok: #297D4E;
-  --ue-warn: #97641A;
+  --ue-warn: #966319;
   --ue-danger: #BE4736;
   --ue-info: #0C798A;
   --ue-focus: #7A3FD666;
@@ -89,7 +93,7 @@
   --color-primary-content: #121212;
   --color-secondary: #25E0F8;
   --color-secondary-content: #121212;
-  --color-accent: #25E0F8;
+  --color-accent: #E8A33D;
   --color-accent-content: #121212;
   --color-neutral: #26242C;
   --color-neutral-content: #FFFFFF;
@@ -113,7 +117,11 @@
   --ue-primary-hover: #D29BFF;
   --ue-primary-ink: #121212;
   --ue-secondary: #25E0F8;
+  --ue-secondary-hover: #5CE8FA;
   --ue-secondary-ink: #121212;
+  --ue-accent: #E8A33D;
+  --ue-accent-hover: #F0B75F;
+  --ue-accent-ink: #121212;
   --ue-status-ink: #121212;
   --ue-ok: #5CD68C;
   --ue-warn: #F2B84B;
@@ -143,12 +151,15 @@
   --color-line: var(--color-base-300);
   --color-primary-ink: var(--color-primary-content);
   --color-secondary-ink: var(--color-secondary-content);
+  --color-accent-ink: var(--color-accent-content);
   --color-ok: var(--color-success);
   --color-warn: var(--color-warning);
   --color-danger: var(--color-error);
   --color-muted: var(--ue-muted);
   --color-surface-raised: var(--ue-surface-raised);
   --color-primary-hover: var(--ue-primary-hover);
+  --color-secondary-hover: var(--ue-secondary-hover);
+  --color-accent-hover: var(--ue-accent-hover);
   --color-focus: var(--ue-focus);
 }
 

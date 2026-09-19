@@ -19,7 +19,9 @@ import {
   daisyMapOverrides,
   utilityAliases,
   contrastPairs,
+  indicatorPairs,
   AA_TEXT,
+  AA_NON_TEXT,
 } from './tokens.source.mjs'
 
 const resolvePath = (relative) => fileURLToPath(new URL(relative, import.meta.url))
@@ -80,8 +82,20 @@ export const contrastPairs: ReadonlyArray<readonly [ColorToken, ColorToken]> = [
 ${contrastPairs.map(([fg, bg]) => `  ['${fg}', '${bg}'],`).join('\n')}
 ]
 
+/**
+ * Pairs held to the non-text bar instead. WCAG 1.4.11 applies 3:1 to UI
+ * components and graphical objects, which is what an indicator dot or a badge
+ * fill is; body text is the stricter 1.4.3 list above.
+ */
+export const indicatorPairs: ReadonlyArray<readonly [ColorToken, ColorToken]> = [
+${indicatorPairs.map(([fg, bg]) => `  ['${fg}', '${bg}'],`).join('\n')}
+]
+
 /** WCAG AA minimum contrast ratio for body text. */
 export const AA_TEXT = ${AA_TEXT}
+
+/** WCAG AA minimum contrast ratio for non-text UI components. */
+export const AA_NON_TEXT = ${AA_NON_TEXT}
 `
 
 // --------------------------------------------------------------- tokens.css

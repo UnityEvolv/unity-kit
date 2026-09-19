@@ -85,17 +85,38 @@ object, and daisyUI theme definitions. Three hand-kept copies drift, and the cop
 drifts is usually the one the contrast page reads, so the page reports a number the build
 does not ship. Generating all three removes that failure entirely.
 
-`src/contrast.test.ts` asserts WCAG AA for every text-weight pair in both themes, so a
-colour that breaks contrast fails the pull request. The Storybook page at
-`Foundations/Tokens` renders from the same functions — it is the readable view, not the
-gate. `line` is deliberately exempt: WCAG 1.4.11 covers boundaries that carry meaning, and
-holding a plain divider to 3:1 forces it to read as a heavy rule.
+`src/contrast.test.ts` asserts contrast for every pair in both themes, so a colour that
+breaks it fails the pull request. The Storybook page at `Foundations/Tokens` renders from
+the same functions — it is the readable view, not the gate.
 
-Four light-mode values deviate from UKIT-29 as originally written. The story's
-`secondary`/`info`, `ok`, `warn` and `danger` measure 3.83, 4.25, 3.64 and 4.49 against the
-light background, all below AA, which its own acceptance criteria require. Each is deepened
-along the same hue until it clears 4.5:1 with headroom. Dark mode uses the brand values
-unchanged; it already passes everywhere.
+There are two tiers, because WCAG has two:
+
+- **Text, 4.5:1** (WCAG 1.4.3) — anything rendered as words, and the ink on every fill.
+- **Non-text, 3:1** (WCAG 1.4.11) — indicators, badge fills and graphical objects. `accent`
+  lives here. Holding it to the text bar is not the safer choice: it forces every indicator
+  dark enough that hues stop being distinguishable from each other.
+
+`line` is exempt from both. WCAG 1.4.11 covers boundaries that carry meaning, and holding a
+plain divider to 3:1 forces it to read as a heavy rule.
+
+Five light-mode values deviate from UKIT-29 as written. The story's `secondary`/`info`,
+`ok`, `warn`, `danger` and `accent` measure 3.83, 4.25, 3.64, 4.49 and 3.85 against the
+light background, all below the AA its own acceptance criteria require. Each is deepened
+along its own hue until it clears its tier with headroom. Light `accent-ink` is dark rather
+than the story's white, which follows from accent sitting in the non-text tier. Dark mode
+uses the brand values unchanged; it already passes everywhere.
+
+### accent and warn share a hue
+
+They are hue 37 and 36 in light, 36 and 39 in dark — the same colour. Shifting accent to
+gold does not fix it: forced to the same AA lightness, gold and ochre land at a luminance
+ratio of 1.00 to each other. They are separated here by lightness instead, 1.61 apart in
+light and 1.20 in dark, and `src/contrast.test.ts` pins that separation so a later nudge
+cannot quietly collapse them.
+
+It works, but it is thin, and it is the reason a mention badge and a warning can look
+alike. A genuinely distinct third voice needs a different hue family — a brand decision,
+not an implementation one. Raise it before building anything that shows both at once.
 
 ## Styling conventions
 
@@ -108,6 +129,12 @@ unchanged; it already passes everywhere.
   vocabulary cannot be removed from this repository. Adding a second one that components
   also use would mean two names for the same colour in the same file. `npm run lint`
   rejects a brand alias in `src/components/**`.
+- **Each colour has one job.** `primary` carries actions — buttons, join, the selected
+  item, the focus ring. `secondary` is the second voice: links, the active speaker, the
+  in-a-call status. `accent` is attention that is *not* an action — a raised hand, an
+  unread mention, a recording indicator, a chart's second series — and is never a button's
+  default colour. `ok`/`warn`/`danger` are status; `info` is a neutral notice. Everything
+  else stays neutral so the content is the colour on screen.
 - Muted text uses the `muted` token (`text-muted`, or `--ue-muted` outside Tailwind), not
   an opacity modifier. `text-base-content/60` composites to roughly 4.1:1 on the dark
   background — below AA — whereas both `muted` values are checked in CI and pass. Opacity

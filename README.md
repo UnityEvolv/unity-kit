@@ -96,18 +96,33 @@ page ends up reporting a number the build does not ship.
 
 ### Contrast is a build gate, not a page
 
-`src/contrast.test.ts` asserts WCAG AA (4.5:1) for every text-weight pair in both themes,
-reading the same tokens the CSS is generated from. A colour that breaks contrast fails the
-pull request. The `Foundations/Tokens` Storybook page renders every ratio from the same
-functions — it is the readable view, not the check.
+`src/contrast.test.ts` asserts contrast for every pair in both themes, reading the same
+tokens the CSS is generated from. A colour that breaks it fails the pull request. The
+`Foundations/Tokens` Storybook page renders every ratio from the same functions — it is
+the readable view, not the check.
 
-Four light-mode values are deeper than the raw brand palette. `#25E0F8` cyan measures
-1.6:1 on white and `#C27FFF` lavender 2.1:1, so neither can carry text in light mode; the
-brand is dark-first. The light theme uses deepened partners of the same hue, and dark mode
-uses the brand values unchanged.
+Two tiers, because WCAG has two: **4.5:1 for text** (WCAG 1.4.3), and **3:1 for non-text UI
+components** (1.4.11) such as indicator dots, badge fills and chart series. `accent` sits
+in the second tier — it is never rendered as body text, and holding it to the text bar
+would force it dark enough to be indistinguishable from `warn`.
 
-`line` is exempt from the contrast check by design: WCAG 1.4.11 covers boundaries that
-carry meaning, not dividers that merely separate content.
+Light-mode values are deeper than the raw brand palette. `#25E0F8` cyan measures 1.6:1 on
+white and `#C27FFF` lavender 2.1:1, so neither can carry text in light mode; the brand is
+dark-first. The light theme uses deepened partners of the same hue, and dark mode uses the
+brand values unchanged.
+
+`line` is exempt from both tiers by design: WCAG 1.4.11 covers boundaries that carry
+meaning, not dividers that merely separate content.
+
+### The three voices
+
+`primary` carries actions, `secondary` is the second voice (links, active speaker, status),
+and `accent` is attention that is not an action — a raised hand, an unread mention, a
+recording indicator, a chart's second series. `accent` is never a button's default colour.
+
+`accent` and `warn` share a hue, so they are separated by lightness rather than colour, and
+a test pins that separation. It works, but a mention badge and a warning can still look
+alike; a genuinely distinct third voice would need a different hue family.
 
 ## Local development
 
