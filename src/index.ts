@@ -7,6 +7,13 @@ export type { BadgeProps, BadgeVariant, BadgeSize } from './components/Badge'
 export { Alert } from './components/Alert'
 export type { AlertProps, AlertVariant } from './components/Alert'
 
+export { Card } from './components/Card'
+export type { CardProps, CardVariant, CardMediaPosition } from './components/Card'
+
+export { Stat, StatGroup } from './components/Stat'
+export type { StatProps, StatDirection, StatTone } from './components/Stat'
+export type { StatGroupProps, StatGroupDirection } from './components/Stat'
+
 export { Brand, UEMark, UOMark } from './components/Brand'
 export type { BrandProps, BrandProduct, BrandSize, MarkProps } from './components/Brand'
 

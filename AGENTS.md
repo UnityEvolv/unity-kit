@@ -255,6 +255,49 @@ show.
   would announce the same state twice. `spinnerClass` is not exported from the package —
   it hands out daisyUI class names, which a consumer should never hold.
 
+## Cards and stats
+
+`Card` is a frame and nothing else: radius, surface, border, padding, and where the
+header, footer and media sit. What goes inside each slot is the consuming app's, which
+is why the body is a plain `children` slot rather than a set of sub-components.
+
+- **Charts are deliberately not in the kit.** An app renders its own chart inside a Card.
+  Shipping one would mean picking a charting library for every consumer and owning its
+  theming, and the Card already gives the chart its frame.
+- **The slots are props, not sub-components** — `header`, `footer`, `media` — for the same
+  reason `Button` takes an icon as a prop. The kit owns which daisyUI class each slot gets
+  (`card-title`, `card-actions`, `figure`) so a consumer never writes one. It does not own
+  the heading level: pass a heading element into `header` when the card titles a section.
+- **`interactive` is bordered plus a hover and a focus ring.** `href` renders the card as
+  an anchor, which is what makes a whole-card link focusable and keyboard-activatable
+  without hand-rolling either, and it turns the affordance on whichever variant is chosen.
+  Apps on a client-side router use `variant="interactive"` and supply their own link — the
+  kit is router-agnostic and will not import one.
+
+Three daisyUI defaults are deliberately overridden, and each would be a silent bug if
+restored:
+
+- **`.card` and `.stats` set no background.** daisyUI gives them a radius and a layout
+  only, so both components add `bg-base-100`. Without it a card is invisible on the page
+  background apart from its border.
+- **`.card-border` draws in `base-200`**, which is `#FAF8FC` against a `#FFFFFF` surface
+  in light mode — a border nobody can see. `border-base-300` is the kit's line token.
+- **`.stat-title` and `.stat-desc` are `base-content` at 60%**, the exact composite
+  AGENTS.md warns about elsewhere: roughly 4.1:1 on the dark background, below AA. Both
+  get the `muted` token instead, which `src/contrast.test.ts` measures in both themes.
+
+`Stat` separates **direction** from **tone**. Direction picks the arrow; tone picks the
+colour, defaulting from direction. Up is not always good news — dropped calls, latency
+and cost all read the other way — so a metric where rising is bad keeps the arrow pointing
+up and sets `tone="negative"`. The arrow also means the delta does not rely on colour
+alone to be understood.
+
+`StatGroup` stacks below `sm` and sits in a row above it by default. daisyUI's `.stats` is
+a grid with `grid-auto-flow: column`: it scrolls horizontally rather than wrapping, so on a
+phone a row of metrics runs off the edge instead of reflowing. Stacking is daisyUI's own
+answer and it is the default here so a dashboard row survives a narrow viewport without
+the consumer thinking about it; `horizontal` and `vertical` pin it.
+
 ## Styling conventions
 
 - Use daisyUI semantic tokens (`bg-primary`, `text-base-content`), never raw Tailwind
