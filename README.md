@@ -305,6 +305,77 @@ pinned to the edge of a page rather than floating on it as a card. It is a prop 
 than a second component, because a `Banner` would be an `Alert` with two class names
 changed, and two names for one thing drift apart.
 
+## Form primitives
+
+`Input`, `Textarea`, `Select`, `Checkbox`, `Radio` and `Toggle`, all rendering through one
+`Field` wrapper that owns the label, the help text, the error message and the required
+marker.
+
+```tsx
+import { Input, Select, Checkbox, Field } from '@unityevolv/unitykit'
+
+<Input label="Email" type="email" required help="We only use it for the invite." />
+<Input label="Email" error="That address is already in use." />
+
+<Select label="Room" placeholder="Choose a room">
+  <option value="standup">Standup</option>
+</Select>
+
+<Field as="fieldset" label="Notify me about" help="You can change this later.">
+  <Checkbox label="Mentions" defaultChecked />
+  <Checkbox label="Direct messages" />
+</Field>
+```
+
+### One prop, four things wired
+
+`error` shows the message, points `aria-describedby` at it, sets `aria-invalid` on the
+control and turns the border red. There is no way to get three of the four, because the
+class comes from the same value the ARIA does — a red border with no `aria-invalid` is a
+field that looks wrong to one person and fine to another.
+
+**Help text stays when there is an error.** Help usually states the rule and the error
+states the violation, so hiding the rule at the moment it is broken is backwards. Both are
+referenced, in that order.
+
+The error carries `role="alert"`, so a message that appears after a submit is announced
+even when focus has not moved to the field.
+
+### Required is an attribute, not an asterisk
+
+`required` goes on the control, which is what a screen reader announces. The asterisk on
+the label is `aria-hidden` decoration — the field is still named "Email", not "Email star".
+A form doing its own validation turns the browser's bubbles off with `noValidate` on the
+`<form>`, rather than the field lying about whether an answer is needed.
+
+### Sizes come from the theme
+
+`xs` through `lg`, and every one of them resolves to daisyUI's `--size-field` (inputs,
+selects, textareas) or `--size-selector` (checkboxes, radios, toggles). Both are now stated
+in the generated theme rather than left to daisyUI's fallback, so one edit in
+`scripts/tokens.source.mjs` moves every control together.
+
+### Field on its own
+
+Every control already renders through `Field`, so it is rarely needed directly. Reach for
+it when wrapping a control the kit does not ship — its children can be a function, which
+receives the same wiring the kit's own controls get:
+
+```tsx
+<Field label="Country" error={errors.country}>
+  {(control) => <ThirdPartyCombobox {...control} />}
+</Field>
+```
+
+`as="fieldset"` turns the label into a legend, which is the only thing that names a group
+of radios or checkboxes, and `disabled` then disables every control inside it natively.
+
+### Uncontrolled, and agnostic about form libraries
+
+`ref`, `name`, `defaultValue` and `onChange` all pass through untouched, so
+react-hook-form's `register()` spreads onto any of these and a plain `<form>` reads them by
+name. The kit depends on no form library and never will.
+
 ## Brand
 
 A product's identity — the monogram, then the product name in two tones, the way

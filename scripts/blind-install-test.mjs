@@ -145,6 +145,12 @@ export const components = Object.entries(kit).filter(([name, value]) =>
 // component declares one valid set of props as a \`sampleProps\` static, and this
 // renders with that. Components whose props are all optional declare nothing.
 export const propsFor = (Component) => Component.sampleProps ?? null
+
+// The name is passed as children so a component that expects some has content
+// to draw — but only when it has not said how it wants to be rendered. A form
+// control cannot take children at all, and putting them on a void element
+// throws, so declaring sampleProps is also how a component opts out of them.
+export const childrenFor = (Component, name) => (Component.sampleProps ? undefined : name)
 `,
   )
 
@@ -152,12 +158,12 @@ export const propsFor = (Component) => Component.sampleProps ?? null
     join(app, 'src', 'main.jsx'),
     `import { createElement } from 'react'
 import { createRoot } from 'react-dom/client'
-import { components, propsFor } from './components.js'
+import { components, propsFor, childrenFor } from './components.js'
 import './index.css'
 
 createRoot(document.getElementById('root')).render(
   components.map(([name, Component]) =>
-    createElement(Component, { key: name, ...propsFor(Component) }, name),
+    createElement(Component, { key: name, ...propsFor(Component) }, childrenFor(Component, name)),
   ),
 )
 `,
@@ -169,7 +175,7 @@ createRoot(document.getElementById('root')).render(
     join(app, 'render.mjs'),
     `import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { components, propsFor } from './src/components.js'
+import { components, propsFor, childrenFor } from './src/components.js'
 
 // Each render is caught so one broken component reports itself by name instead
 // of crashing the run with a React stack that never mentions which export it was.
@@ -177,7 +183,9 @@ const failures = []
 const html = components
   .map(([name, Component]) => {
     try {
-      return renderToStaticMarkup(createElement(Component, propsFor(Component), name))
+      return renderToStaticMarkup(
+        createElement(Component, propsFor(Component), childrenFor(Component, name)),
+      )
     } catch (error) {
       failures.push({ name, message: error.message })
       return ''

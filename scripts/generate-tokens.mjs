@@ -139,6 +139,8 @@ ${brandProps(theme, '  ')}
   --radius-field: ${scales.radius.md};
   --radius-box: ${scales.radius.lg};
   --border: 1px;
+  --size-field: ${scales.size.field};
+  --size-selector: ${scales.size.selector};
 }`
 }
 
