@@ -50,3 +50,24 @@ jobs:
       # checkout, so an undeclared dependency or a class name that never compiles to
       # CSS fails the PR instead of reaching a consumer.
       - run: npm run blind-test
+
+  changeset:
+    name: Changeset present
+    # Every PR that changes the package declares its bump level at PR time
+    # (UKIT-27), so the changelog writes itself and the release never guesses.
+    # A docs-only change adds an empty one: npx changeset add --empty.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx changeset status --since=origin/${{ github.base_ref }}
