@@ -303,6 +303,36 @@ size, which is the fastest way to spot one that does not.
 Nothing ships with an emoji as an icon. Emoji render differently on every platform and
 cannot take a colour.
 
+## File dropzone
+
+`Dropzone` collects files by drag-and-drop or from the picker and reports them. It uploads
+nothing: progress and per-file failures come back in as props, keyed by `fileKey(file)`.
+
+```tsx
+import { Dropzone, fileKey } from '@unityevolv/unitykit'
+
+<Dropzone
+  label="Attachments"
+  multiple
+  accept="image/*,.pdf"                // MIME types and extensions; also filters drops
+  maxSize={5 * 1024 * 1024}
+  maxFiles={4}
+  files={files}
+  onChange={setFiles}
+  onReject={(rejections) => log(rejections)}
+  progress={{ [fileKey(file)]: 40 }}   // 0–100 per file; 100 shows a done mark
+  fileErrors={{ [fileKey(other)]: 'The server refused this file.' }}
+/>
+```
+
+- **The target is a real `<button>`**, so it is focusable and Enter or Space open the
+  picker without any key handling; the file input beside it is out of the tab order.
+- **Rejections are inline and explained**: a danger `Alert` lists each refused file with
+  the reason (type, size, count), and `onReject` gets the same list. The Field `error`
+  is separate and stays yours ("Add at least one file").
+- **States**: idle, drag-over, disabled and error each have their own frame.
+- daisyUI's `file-input` styles only the bare input; the dropzone is the kit's own.
+
 ## Alerts and banners
 
 A message that belongs on the page — a warning that stays put, an explanation of why a

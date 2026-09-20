@@ -207,6 +207,22 @@ Leave it off and the test fails by name asking for it. It does not skip the comp
 because skipping would drop the one whose real risk — an undeclared dependency on the icon
 library — is exactly what that test exists to catch.
 
+## File dropzone
+
+- **The target is a `<button type="button">`**, not a `div` with `tabIndex` and key
+  handlers: it is labelable (so the Field's `label` works), focusable, and Enter/Space
+  are native. The `<input type="file">` is a sibling with `tabIndex=-1` and
+  `aria-hidden`, opened programmatically; its `value` is cleared after each change so
+  picking the same file twice still fires.
+- **`accept` filters drops too.** The attribute only filters the picker; dropped files
+  bypass it, so `accepts()` re-checks by extension, `type/*` wildcard and exact type.
+- **The kit never uploads.** `progress` and `fileErrors` are props keyed by
+  `fileKey(file)` (name, size, lastModified), because two `File` objects for the same
+  file are not equal and a `File` has no id.
+- **Rejections are the dropzone's state; `error` is the Field's.** They answer different
+  questions ("why was this file refused" vs "what does the form require") and both can be
+  true at once.
+
 ## Alerts
 
 `Alert` is a message that belongs on the page. `Toast` (UKIT-8) is transient feedback
