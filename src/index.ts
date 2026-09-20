@@ -4,6 +4,7 @@ export type { ButtonProps, ButtonVariant, ButtonSize } from './components/Button
 export { Badge } from './components/Badge'
 export type { BadgeProps, BadgeVariant, BadgeSize } from './components/Badge'
 
+
 export { Alert } from './components/Alert'
 export type { AlertProps, AlertVariant } from './components/Alert'
 
@@ -13,6 +14,14 @@ export type { CardProps, CardVariant, CardMediaPosition } from './components/Car
 export { Stat, StatGroup } from './components/Stat'
 export type { StatProps, StatDirection, StatTone } from './components/Stat'
 export type { StatGroupProps, StatGroupDirection } from './components/Stat'
+
+export { Avatar, AvatarGroup } from './components/Avatar'
+export type {
+  AvatarProps,
+  AvatarSize,
+  AvatarStatus,
+  AvatarGroupProps,
+} from './components/Avatar'
 
 export { Field } from './components/Field'
 export type { FieldProps, FieldSize, FieldControlProps } from './components/Field'

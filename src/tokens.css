@@ -36,6 +36,14 @@
   --ue-warn: #966319;
   --ue-info: #0C798A;
   --ue-focus: #7A3FD666;
+  --ue-avatar-1: #7A3FD6;
+  --ue-avatar-2: #DCC6FA;
+  --ue-avatar-3: #2D62A5;
+  --ue-avatar-4: #AFCCF5;
+  --ue-avatar-5: #0C798A;
+  --ue-avatar-6: #93D4DE;
+  --ue-avatar-ink-vivid: #FFFFFF;
+  --ue-avatar-ink-muted: #1B1A1F;
 }
 
 [data-theme="dark"] {
@@ -60,6 +68,14 @@
   --ue-warn: #F2B84B;
   --ue-info: #25E0F8;
   --ue-focus: #C27FFF66;
+  --ue-avatar-1: #C27FFF;
+  --ue-avatar-2: #5B2E99;
+  --ue-avatar-3: #6FB4FF;
+  --ue-avatar-4: #23508C;
+  --ue-avatar-5: #25E0F8;
+  --ue-avatar-6: #10646F;
+  --ue-avatar-ink-vivid: #121212;
+  --ue-avatar-ink-muted: #FFFFFF;
 }
 
 /* Follow the operating system until an app sets data-theme explicitly. */
@@ -86,5 +102,13 @@
     --ue-warn: #F2B84B;
     --ue-info: #25E0F8;
     --ue-focus: #C27FFF66;
+    --ue-avatar-1: #C27FFF;
+    --ue-avatar-2: #5B2E99;
+    --ue-avatar-3: #6FB4FF;
+    --ue-avatar-4: #23508C;
+    --ue-avatar-5: #25E0F8;
+    --ue-avatar-6: #10646F;
+    --ue-avatar-ink-vivid: #121212;
+    --ue-avatar-ink-muted: #FFFFFF;
   }
 }

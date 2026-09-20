@@ -136,6 +136,33 @@ variant that should be in the config.
   daisyUI's accent is aliased to primary and the variant would be a synonym; there is no
   `link` badge, because daisyUI has no badge equivalent and the name would map to no class.
 
+## Avatars
+
+- **The colour is derived, never stored.** `tintIndexFor` hashes the name into one of six
+  slots, so the same person is the same colour in every app with nothing written down.
+  Changing the hash re-colours everyone, so treat it as a public API.
+- **Six tints, because the palette is two hues.** A seventh colour that was neither
+  violet nor teal would be the third hue UKIT-29 removed, so each hue appears twice —
+  vivid and muted — and the separation comes from lightness. CIEDE2000 puts the closest
+  pair at 15.3 in light mode and 17.8 in dark. Adding a tint means checking both numbers,
+  not just picking something that looks nice.
+- **Initials are text.** WCAG 1.4.3 applies, so every tint is in `contrastPairs` against
+  the ink it is drawn with. The tints are `--ue-*` custom utilities rather than daisyUI
+  ones, which means nothing else would notice if they stopped being emitted — the avatar
+  would simply go transparent — so `Avatar.test.tsx` asserts the generated theme still
+  defines all eight.
+- **Status is never colour alone.** WCAG 1.4.1. The dot is `aria-hidden` and the word
+  goes into the accessible name. Anything added later that signals state by colour does
+  the same.
+- **daisyUI's avatar classes are deliberately unused.** It ships `avatar-online` and
+  `avatar-offline` and nothing for busy or away, so half the states would be its dot and
+  half ours, at two sizes and two positions. Four drawn the same way is simpler than two
+  borrowed and two invented. `avatar-group` is also unused: it sets `overflow: hidden`,
+  which clips the status dots.
+- **Size travels by context, not by cloning children.** `AvatarGroup` provides it and
+  `Avatar` reads it. Cloning would work until someone wrapped an avatar in a tooltip or a
+  link, at which point the clone lands on the wrapper and the size vanishes.
+
 ## Icons
 
 Every icon goes through `<Icon name="..." />`. `src/components/Icon/icons.ts` is the only
