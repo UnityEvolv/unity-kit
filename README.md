@@ -615,6 +615,38 @@ row's checkbox selects it and does not activate it.
 
 Pagination is deliberately not here; it lands as its own component.
 
+## Stepper and Wizard
+
+`Stepper` shows where you are in a multi-step flow. `Wizard` is a stepper with a memory:
+it holds the active index, renders that step's content and gives Back and Next something
+to do. Step content is entirely yours; the kit does not know what a step contains.
+
+```tsx
+import { Stepper, Wizard } from '@unityevolv/unitykit'
+
+<Stepper steps={steps} current={1} errorSteps={['team']} onStepClick={setCurrent} />
+
+<Wizard
+  steps={[
+    { key: 'account', label: 'Account', content: <AccountForm /> },
+    { key: 'team', label: 'Team', content: (api) => <TeamForm onSkip={api.next} /> },
+    { key: 'done', label: 'Done', content: <Summary /> },
+  ]}
+  canProceed={form.isValid}           // false disables Next and blocks any jump forward
+  onFinish={submit}
+/>
+```
+
+- **States are derived from the index**: before it complete, at it current, after it
+  upcoming; `errorSteps` overrides by key. Each state is said in words for a screen reader
+  and drawn with a glyph, not colour alone — a check for complete, a mark for error.
+- **An ordered list with `aria-current="step"`** on the current one.
+- **Responsive by default**: vertical below `sm`, horizontal above; `orientation` pins it.
+- **Click-to-navigate is opt-in** (`onStepClick`) and reaches completed and error steps
+  only; `allowUpcoming` opens the rest. `Wizard` maps that to `linear` (default true).
+- **`Wizard` exposes `next`, `back`, `goTo`** to step content and to a custom `footer`
+  as a render-prop argument, so a step is a plain component with no hook to import.
+
 ## Local development
 
 ```bash
