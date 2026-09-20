@@ -136,6 +136,33 @@ variant that should be in the config.
   daisyUI's accent is aliased to primary and the variant would be a synonym; there is no
   `link` badge, because daisyUI has no badge equivalent and the name would map to no class.
 
+## Avatars
+
+- **The colour is derived, never stored.** `tintIndexFor` hashes the name into one of six
+  slots, so the same person is the same colour in every app with nothing written down.
+  Changing the hash re-colours everyone, so treat it as a public API.
+- **Six tints, because the palette is two hues.** A seventh colour that was neither
+  violet nor teal would be the third hue UKIT-29 removed, so each hue appears twice —
+  vivid and muted — and the separation comes from lightness. CIEDE2000 puts the closest
+  pair at 15.3 in light mode and 17.8 in dark. Adding a tint means checking both numbers,
+  not just picking something that looks nice.
+- **Initials are text.** WCAG 1.4.3 applies, so every tint is in `contrastPairs` against
+  the ink it is drawn with. The tints are `--ue-*` custom utilities rather than daisyUI
+  ones, which means nothing else would notice if they stopped being emitted — the avatar
+  would simply go transparent — so `Avatar.test.tsx` asserts the generated theme still
+  defines all eight.
+- **Status is never colour alone.** WCAG 1.4.1. The dot is `aria-hidden` and the word
+  goes into the accessible name. Anything added later that signals state by colour does
+  the same.
+- **daisyUI's avatar classes are deliberately unused.** It ships `avatar-online` and
+  `avatar-offline` and nothing for busy or away, so half the states would be its dot and
+  half ours, at two sizes and two positions. Four drawn the same way is simpler than two
+  borrowed and two invented. `avatar-group` is also unused: it sets `overflow: hidden`,
+  which clips the status dots.
+- **Size travels by context, not by cloning children.** `AvatarGroup` provides it and
+  `Avatar` reads it. Cloning would work until someone wrapped an avatar in a tooltip or a
+  link, at which point the clone lands on the wrapper and the size vanishes.
+
 ## Icons
 
 Every icon goes through `<Icon name="..." />`. `src/components/Icon/icons.ts` is the only
@@ -408,6 +435,32 @@ Without them Radix's positioning throws a `TypeError` and an overlay test fails 
 reasons that have nothing to do with the overlay. Those stubs report no geometry on
 purpose: assert behaviour and markup, never where a panel landed on screen.
 
+
+## Tables
+
+`Table` is a generic component over one column definition and renders either a daisyUI
+table or a list of `Card`s. Decisions that are easy to undo by accident:
+
+- **The layout switch is a JS media query on `(pointer: coarse)`, not a Tailwind
+  breakpoint.** The two layouts have different DOM, and rendering both and hiding one
+  hands a screen reader two copies of every row. `useCoarsePointer` is a
+  `useSyncExternalStore` over `matchMedia`, so it flips live when a tablet docks, and it
+  reports a fine pointer wherever `matchMedia` is missing (jsdom, SSR) so the server
+  markup is the one with real table semantics.
+- **It never sorts and never fetches.** `sort` is drawn as `aria-sort` plus an indicator;
+  `onSortChange` reports the next sort (unsorted → asc, asc → desc, desc → asc). Rows are
+  rendered in the order given. Selection is controlled the same way.
+- **Row activation is a title button, not a `tabIndex` on the row.** A focusable `tr` or
+  card with a checkbox inside is a nested interactive control with no role. The title
+  cell becomes a real `<button>` in both layouts, and the row-wide click handler is a
+  pointer convenience that ignores clicks landing on any control.
+- **Loading rows are `Skeleton`, and the error is `Alert`.** The wrapper carries
+  `aria-busy`; skeletons stay `aria-hidden`, so the state is announced once. The empty
+  panel is `EmptyState`, replaceable through `empty`.
+- **`table-zebra` and `table-pin-rows` are pure CSS.** Pinning only shows inside a
+  scrolling ancestor with a bounded height, which is the consumer's container, not the
+  table's. The `checkbox` inputs are plain daisyUI inputs with `aria-label`, because a
+  cell has no room for a visible label.
 
 ## Styling conventions
 

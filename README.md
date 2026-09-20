@@ -181,6 +181,59 @@ One wrinkle worth knowing before copying it: derive props with
 directly. That type admits `null` for every variant — CVA's way of spelling "no class" —
 and a nullable `size` cannot index a lookup table.
 
+## Avatars
+
+A person, as a picture or as their initials, with an optional presence dot.
+
+```tsx
+import { Avatar, AvatarGroup } from '@unityevolv/unitykit'
+
+<Avatar name="Sasha Kim" src={user.photo} status="online" />
+<Avatar name="Sasha Kim" size="xl" />          // initials, if there is no photo
+
+<AvatarGroup size="sm" max={3}>
+  {people.map((p) => <Avatar key={p.id} name={p.name} src={p.photo} />)}
+</AvatarGroup>
+```
+
+Sizes are `xs` 24px through `xl` 64px. The initials, the status dot and the overlap in a
+group all follow the size, so a caller sets one thing.
+
+### Six tints, not a rainbow
+
+The colour comes from the name, so the same person is the same colour in every app
+without anything being stored. There are six to choose from rather than the dozen most
+kits offer, because the palette is two hues and a seventh colour that was neither violet
+nor teal would be the third hue UKIT-29 removed. Each hue therefore appears twice, vivid
+and muted, which buys separation from lightness instead of from a new colour.
+
+Measured with CIEDE2000, the closest pair is 15.3 apart in light mode and 17.8 in dark —
+far enough to tell two people apart at a glance. Initials are text, so each tint is
+checked against its own ink for AA in `src/contrast.test.ts` along with everything else.
+
+The slots hold their hue across themes: whoever is violet in light mode is violet in dark
+mode, even though neither value is the same.
+
+### The status dot is never colour alone
+
+WCAG 1.4.1. The dot is `aria-hidden` and the word goes into the accessible name, so the
+avatar reads as "Sasha Kim, busy" rather than as a colour nobody can see. Pass
+`statusLabel` when the app has its own wording — "in a meeting" rather than "busy".
+
+The four states are `online`, `busy`, `away` and `offline`, mapped to the theme's
+success, error, warning and line colours. That vocabulary is the kit's; consuming apps
+map their own presence states onto it rather than the kit growing a fifth for each
+product.
+
+daisyUI's `avatar-online` and `avatar-offline` are not used. They cover two of the four
+states, so half the dots would be daisyUI's and half ours — two sizes, two positions, one
+inconsistency. Four drawn the same way is simpler than two borrowed and two invented.
+
+### A broken image falls back
+
+`onError` swaps to the initials, and a new `src` tries again. A dead avatar URL is the
+most common way this component meets reality, and an empty square is worse than initials.
+
 ## Icons
 
 One component, so no app ever imports an icon library directly.
@@ -529,6 +582,69 @@ spinner drops to a quarter speed. Neither component stacks a `motion-reduce:` va
 top. Since a dependency is satisfying one of the kit's accessibility promises, the tests
 read daisyUI's own CSS and assert it still does, so an upgrade that dropped it fails the
 build instead of quietly shipping a strobe.
+
+## Tables
+
+`Table` renders tabular data from one column definition, as rows for a mouse and as a
+list of cards for a finger. It fetches nothing and sorts nothing: rows arrive already
+sorted, and a click on a sortable heading only reports what the user asked for.
+
+```tsx
+import { Table } from '@unityevolv/unitykit'
+import type { TableColumn } from '@unityevolv/unitykit'
+
+const columns: TableColumn<Room>[] = [
+  { key: 'name', header: 'Room', sortable: true, card: 'title' },
+  { key: 'floor', header: 'Floor' },
+  { key: 'seats', header: 'Seats', align: 'end', sortable: true },
+  { key: 'status', header: 'Status', cell: (r) => <Badge>{r.status}</Badge>, card: 'hidden' },
+]
+
+<Table
+  caption="Rooms"
+  columns={columns}
+  rows={rooms}                       // already sorted
+  rowKey={(r) => r.id}
+  sort={sort}
+  onSortChange={setSort}             // you re-order rows; the table draws the arrow
+  selectable
+  selected={selected}
+  onSelectionChange={setSelected}
+  onRowClick={(r) => open(r.id)}
+  loading={query.isPending}
+  error={query.error?.message}
+  onRetry={query.refetch}
+  zebra
+  pinHeader
+/>
+```
+
+### Cards come from the pointer, not the viewport
+
+`layout="auto"` (the default) watches `(pointer: coarse)`. A touch device gets cards at
+any window size; a desktop window dragged narrow keeps its rows, because a mouse can
+still hit a small cell and a horizontal scrollbar is fine. `layout="table"` or
+`layout="cards"` pins it. Only the active layout is in the DOM, so a screen reader never
+meets two copies of the data.
+
+The same columns drive both. On a card the `card` hint says what each column becomes:
+`title` is the heading, `body` (the default) a labelled line, `hidden` left out. When no
+column claims `title`, the first one is the heading, so a card always has one.
+
+### Loading, empty and error are props
+
+`loading` draws skeleton rows and marks the region `aria-busy`; the skeletons themselves
+are silent, so nothing announces twice. An empty `rows` shows an `EmptyState`, which
+`empty` replaces with your own. `error` swaps the rows for a danger `Alert`, and
+`onRetry` adds a "Try again" button to it. Both layouts show identical states.
+
+### Activation is a real button
+
+With `onRowClick`, a pointer can click anywhere on the row or card, and the title cell
+becomes a `<button>` so the keyboard and a screen reader get the same action. Clicking a
+row's checkbox selects it and does not activate it.
+
+Pagination is deliberately not here; it lands as its own component.
 
 ## Local development
 
