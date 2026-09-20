@@ -19,6 +19,7 @@ import {
   Lock,
   LogOut,
   Maximize,
+  Menu,
   MessageSquare,
   Mic,
   MicOff,
@@ -83,6 +84,7 @@ export const iconComponents = {
   lock: Lock,
   unlock: Unlock,
   bell: Bell,
+  menu: Menu,
   message: MessageSquare,
 
   // Navigation and actions

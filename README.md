@@ -358,6 +358,43 @@ pinned to the edge of a page rather than floating on it as a card. It is a prop 
 than a second component, because a `Banner` would be an `Alert` with two class names
 changed, and two names for one thing drift apart.
 
+## Toasts
+
+`toast` is one call from anywhere; `Toaster` is mounted once at the app root and owns the
+stack. Consumers hold no toast state.
+
+```tsx
+// App root, once
+import { Toaster } from '@unityevolv/unitykit'
+<Toaster position="bottom-right" />
+
+// Anywhere — a handler, a data layer, a route loader
+import { toast } from '@unityevolv/unitykit'
+
+toast.success('Room created', { description: 'Reception is ready to use.' })
+toast.error('Could not join', { action: { label: 'Retry', onClick: retry } })
+toast.warning('Storage almost full')
+toast.info('Sasha joined the call')
+
+const id = toast.loading('Saving…')
+toast.success('Saved', { id })              // same id updates in place
+toast.dismiss(id)                           // or toast.dismiss() for all
+
+toast.promise(save(), { loading: 'Saving…', success: 'Saved', error: 'Could not save' })
+```
+
+Underneath is [sonner](https://sonner.emilkowal.ski/): stacking, swipe-to-dismiss, pause
+on hover, queueing and the `aria-live` region are its, because those have more edge cases
+than they look. Each toast is dressed as a daisyUI `alert` in the kit's own icons, so a
+toast and an `Alert` for the same event look the same. The kit's `theme.css` imports
+sonner's positioning stylesheet, so nothing extra is needed in the app.
+
+`toast.success` / `error` / `warning` / `info` are function names, not variant props,
+which is why they do not follow `Alert`'s `ok` / `warn` / `danger`.
+
+Use a toast for feedback about something that just happened and needs no reply. A message
+that belongs on the page — a locked form, a failed load — is an `Alert`.
+
 ## Form primitives
 
 `Input`, `Textarea`, `Select`, `Checkbox`, `Radio` and `Toggle`, all rendering through one
@@ -429,6 +466,55 @@ of radios or checkboxes, and `disabled` then disables every control inside it na
 react-hook-form's `register()` spreads onto any of these and a plain `<form>` reads them by
 name. The kit depends on no form library and never will.
 
+## Combobox
+
+`Combobox` is a text input that filters a list, for picking one option or several from a
+set too long for a `Select`. `Select` stays for a short, fixed list: it is native, and
+native opens best on a phone.
+
+```tsx
+import { Combobox } from '@unityevolv/unitykit'
+import type { ComboboxOption } from '@unityevolv/unitykit'
+
+interface Person extends ComboboxOption { email: string }   // extend with what you render
+
+<Combobox label="Owner" options={people} value={owner} onChange={setOwner} />
+
+<Combobox label="Attendees" options={people} multiple value={ids} onChange={setIds} />
+
+// Fetch on type: with onSearch the kit does no filtering of its own
+<Combobox
+  label="City"
+  options={results}
+  onSearch={(q) => fetchCities(q)}
+  loading={pending}
+  emptyMessage="No city by that name"
+/>
+
+// Your own row
+<Combobox
+  label="Person"
+  options={people}
+  renderOption={(p, { selected }) => (
+    <span className="flex items-center gap-2">
+      <Avatar name={p.label} size="xs" />
+      <span>{p.label} <span className="text-muted">{p.email}</span></span>
+    </span>
+  )}
+/>
+```
+
+- **The ARIA combobox pattern, with active descendant.** Focus stays in the input the
+  whole time; the arrow keys move a highlight the input points at with
+  `aria-activedescendant`. Arrow keys open and move, Home/End jump, Enter picks, Escape
+  closes and restores the chosen label, Tab closes.
+- **Multi-select renders chips** with a remove button each; Backspace on an empty input
+  removes the last one. The list stays open while picking several.
+- **Empty and loading live inside the list** as `role="status"` lines, so they are
+  announced.
+- **Field wiring is the same as every other control**: `label`, `help`, `error`,
+  `required`, `disabled`, `size`. `name` renders hidden inputs for a plain `<form>`.
+
 ## Brand
 
 A product's identity — the monogram, then the product name in two tones, the way
@@ -466,6 +552,37 @@ rendering `Brand` into one.
 > PNG, which cannot be traced into something faithful. Replace the paths in
 > `src/components/Brand/marks.tsx` when the vector artwork exists; nothing outside that
 > file changes, because `Brand` only ever asks for a mark at a height.
+
+## Pagination
+
+`Pagination` moves through a long list page by page. It is controlled throughout — the
+caller owns `page` and `pageSize`, slices or fetches accordingly, and hands the result to
+whatever sits above. It is designed to sit under `Table` but nothing couples them.
+
+```tsx
+import { Pagination } from '@unityevolv/unitykit'
+
+<Pagination
+  page={page}
+  onPageChange={setPage}
+  total={result.total}                // with pageSize, derives the page count
+  pageSize={pageSize}                 //   and turns on "Showing 21 to 30 of 145"
+  pageSizeOptions={[10, 25, 50]}      // renders a "Rows per page" selector
+  onPageSizeChange={(n) => { setPageSize(n); setPage(1) }}
+/>
+
+<Pagination page={page} pageCount={12} onPageChange={setPage} compact />
+```
+
+- **The window keeps a constant width.** First and last page always show, the current
+  page with one sibling each side, and an ellipsis where pages are skipped — but the
+  slack moves to the other end near an edge rather than disappearing, so the row does
+  not change length as the user pages. `siblings` and `boundaries` widen it. The
+  algorithm is exported as `pageWindow` for anything that renders its own controls.
+- **The current page is a button with `aria-current="page"`,** not a span, so it keeps
+  its place in the tab order. The ellipsis is hidden from assistive technology.
+- **`compact`** renders previous, next and "Page 7 of 20", for a strip with no room.
+- The whole thing is a `nav` landmark. Give each one on a page its own `label`.
 
 ## Waiting and nothing-here states
 
@@ -551,6 +668,50 @@ spinner drops to a quarter speed. Neither component stacks a `motion-reduce:` va
 top. Since a dependency is satisfying one of the kit's accessibility promises, the tests
 read daisyUI's own CSS and assert it still does, so an upgrade that dropped it fails the
 build instead of quietly shipping a strobe.
+
+## App shell and navigation
+
+`AppShell` is the frame every consuming app hangs its screens in: a `Navbar` across the
+top, a `Sidebar` beside the content above `lg`, and the same sidebar as a drawer below it.
+`Tabs`, `Breadcrumbs` and `Accordion` are the pieces that go inside.
+
+```tsx
+import { AppShell, Navbar, Sidebar, Breadcrumbs, Tabs, Accordion } from '@unityevolv/unitykit'
+
+<AppShell
+  navbar={<Navbar brand={<Brand product="unityofis" size="sm" />} actions={<UserMenu />} />}
+  sidebar={
+    <Sidebar
+      items={[
+        { key: 'home', label: 'Home', icon: 'office', href: '/' },
+        { key: 'rooms', label: 'Rooms', icon: 'reception', href: '/rooms', badge: <Badge>3</Badge> },
+        { key: 'admin', label: 'Admin', children: [{ key: 'people', label: 'People', href: '/admin' }] },
+      ]}
+      activeKey={routeKey}                       // you say which is current
+      renderLink={({ href, children, className }) => <Link to={href} className={className}>{children}</Link>}
+    />
+  }
+>
+  <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Rooms' }]} renderLink={...} />
+  <Tabs items={[{ value: 'people', label: 'People', content: <People /> }, ...]} />
+  <Accordion type="multiple" items={[{ value: 'audio', title: 'Audio', content: <Audio /> }]} />
+</AppShell>
+```
+
+- **Router-agnostic, by two props.** `activeKey` says which item is current; the kit only
+  draws it. `renderLink` says what a link is; the default is a plain anchor, and a router's
+  `Link` drops in. The package imports no router.
+- **The active item is `aria-current="page"`**, which daisyUI's `menu` already styles as
+  active — the attribute a screen reader needs and the highlight a sighted user sees are
+  one thing.
+- **The sidebar is rendered in one place at a time.** A column above `lg`, a `Drawer` below
+  it, opened by the menu button the `Navbar` grows when it finds a shell with a sidebar
+  around it. Outside a shell the navbar is just a bar.
+- **`Tabs` and `Accordion` are Radix underneath**: arrow keys, Home/End, `aria-controls`
+  and `aria-expanded` are theirs; daisyUI's `tabs` and `collapse` are the look. Tabs are
+  for views in one place, not for navigation between pages.
+- **`Accordion` takes a `headingLevel`** (default `h3`) because a section title's level
+  depends on the page, and `type="multiple"` for a settings page where several stay open.
 
 ## Tables
 

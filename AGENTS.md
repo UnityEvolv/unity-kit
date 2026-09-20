@@ -233,6 +233,29 @@ alert.
   a region's content and may need a heading, an alert is a notice inside a region that
   already has one. Adding a prop nobody needs is worse than the inconsistency.
 
+## Toasts
+
+`Toaster` wraps sonner with `unstyled: true` and dresses each toast through sonner's
+`classNames` as a daisyUI `alert`; `toast` wraps sonner's function so the kit owns the
+API surface and the option names.
+
+- **Do not use daisyUI's `.toast` shell.** It positions with `position: fixed`, and so does
+  sonner; two things placing the same list fight. sonner positions, daisyUI styles the
+  message. `theme.css` carries `@import "sonner/dist/styles.css"` because sonner 2 ships
+  its layout CSS as a file rather than injecting it, and a consumer should not have to
+  know that.
+- **`theme` is pinned to `light`.** sonner's theme only drives its stock look, which is
+  off; leaving it on `system` makes sonner read `prefers-color-scheme` on its own, out of
+  step with `data-theme`.
+- **The close button is `order-last`.** sonner renders it first in the DOM and places it
+  absolutely in styled mode; unstyled, the grid would put it in the first column.
+- **Icons come from the kit's table**, the same glyphs `Alert` uses per variant, so an
+  event reported both ways shows one picture. `loading` uses `spinnerClass`, not the
+  `Spinner` component, because the toast is already a live region.
+- **`toast.success/error/warning/info` are the names**, per the story and every toast
+  library; they are functions, not a `variant` prop, so `Alert`'s `ok/warn/danger` does
+  not apply.
+
 ## Form primitives
 
 Every control renders through `Field`. Nothing in the kit draws its own label.
@@ -274,6 +297,30 @@ Every control renders through `Field`. Nothing in the kit draws its own label.
   cannot take children, and React throws when they reach a void element. Use
   `WithSampleProps` from `src/components/sampleProps.ts` to type a `forwardRef` component
   that carries the static.
+
+## Combobox
+
+`Combobox` is the ARIA combobox pattern written by hand over a Radix Popover used for
+positioning only. The listbox behaviour is the kit's.
+
+- **Radix `Anchor`, not `Trigger`.** A trigger toggles on click and announces itself as
+  opening a dialog; both are wrong for a field you type into. The panel gets
+  `onOpenAutoFocus` and `onCloseAutoFocus` prevented so focus never leaves the input, and
+  `onInteractOutside` ignores the input's own box so clicking into it does not close the
+  list. It reuses `PANEL` from `Popover.tsx` (an internal export) so the two look alike.
+- **Focus stays in the input; the highlight is `aria-activedescendant`.** Options are
+  `li[role=option]` with `aria-selected` and `aria-disabled`; the highlight is a
+  `data-active` attribute styled with a Tailwind data variant. Nothing in the list is
+  focusable. `onMouseDown` on an option is prevented so a click does not blur the input.
+- **A typed query filters; an opened value does not.** Opening on a chosen option shows
+  its label in the input without hiding every other option (`typed` flag). Escape restores
+  the label. With `onSearch` the kit filters nothing and calls it with `''` on open.
+- **The outer box is daisyUI `input` with its height released** (`h-auto flex-wrap`), so
+  chips wrap. `input-error` follows the Field's `aria-invalid`, as every control does.
+- **Generic over the option type.** `ComboboxOption` is the floor (`value`, `label`,
+  `description?`, `disabled?`); consumers extend it and get their type back in
+  `renderOption` and `onChange`. `Combobox` is a plain generic function, not `forwardRef`,
+  for the same reason `Table` is.
 
 ## Brand
 
@@ -367,6 +414,26 @@ phone a row of metrics runs off the edge instead of reflowing. Stacking is daisy
 answer and it is the default here so a dashboard row survives a narrow viewport without
 the consumer thinking about it; `horizontal` and `vertical` pin it.
 
+## Pagination
+
+`Pagination` is daisyUI `join` around the kit's own `Button`s; the page-window logic is
+the kit's own in `pageWindow.ts`, tested on its own without rendering anything.
+
+- **The window has a constant width.** Near an edge the slack moves to the other side
+  instead of disappearing, so the strip never changes length as the user pages and
+  nothing under the cursor jumps. An ellipsis only ever hides two or more pages; a gap
+  of one page shows the page. `pageWindow.test.ts` pins both.
+- **The current page is a focusable button**, marked `aria-current="page"` and drawn
+  primary. Making it a span would drop it from the tab order and break arrowing along
+  the row. The ellipsis is a disabled ghost button with `aria-hidden` and `tabIndex=-1`,
+  so it takes the same space as a page and says nothing.
+- **Controlled only.** `page`, `pageSize` and the callbacks come from the consumer;
+  `pageCount` derives from `total / pageSize` when omitted. A `page` outside the range is
+  clamped for rendering rather than trusted.
+- **The page-size selector is a plain `select` in a wrapping `label`**, not the kit's
+  `Select`: that component stacks its label above the control, and a strip wants the
+  label beside it.
+
 ## Overlays
 
 `Modal`, `Drawer`, `Dropdown`, `Popover` and `Tooltip` are Radix primitives wearing daisyUI
@@ -415,6 +482,29 @@ Without them Radix's positioning throws a `TypeError` and an overlay test fails 
 reasons that have nothing to do with the overlay. Those stubs report no geometry on
 purpose: assert behaviour and markup, never where a panel landed on screen.
 
+
+## App shell and navigation
+
+`AppShell`, `Navbar`, `Sidebar`, `Tabs`, `Breadcrumbs` and `Accordion`. The rules that keep
+the package router-agnostic and the daisyUI classes honest:
+
+- **Never import a router.** Active state comes in as `activeKey`; links go out through
+  `renderLink({ href, children, className })`, whose default is a plain `<a>`. That pair
+  is the whole contract, and it is shared by `Sidebar` and `Breadcrumbs`.
+- **`aria-current="page"` is the active state, and daisyUI reads it.** `.menu` styles
+  `[aria-current]` as active and `.tab` styles `[aria-selected=true]`, so neither
+  component toggles `menu-active` or `tab-active` — the attribute Radix or the kit sets is
+  the single source of truth. In `Sidebar` the attribute sits on a `contents` span around
+  the rendered link, because a custom link may not forward unknown props.
+- **`collapse-open` is applied through a data variant.** daisyUI's `collapse` reads open
+  from a checked input, focus, `[open]` or the `collapse-open` class; Radix keeps it on
+  `data-state`. `data-[state=open]:collapse-open` bridges them with no JS. The trigger is a
+  real `<button>` inside a heading whose level is a prop.
+- **The `Navbar` finds the shell through context** (`useAppShell`), so it draws its menu
+  button only when there is a sidebar to open, and the same component serves a sign-in
+  page. The sidebar element is rendered in the column or the drawer, never both.
+- **`.navbar` and `.menu` set no surface.** Both components add `bg-base-100`, as `Card`
+  and `Stat` do, or they sit invisible on the page background.
 
 ## Tables
 

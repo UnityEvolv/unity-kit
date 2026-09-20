@@ -8,6 +8,9 @@ export type { BadgeProps, BadgeVariant, BadgeSize } from './components/Badge'
 export { Alert } from './components/Alert'
 export type { AlertProps, AlertVariant } from './components/Alert'
 
+export { Toaster, toast } from './components/Toast'
+export type { ToasterProps, ToastPosition, ToastOptions, ToastAction, ToastId } from './components/Toast'
+
 export { Card } from './components/Card'
 export type { CardProps, CardVariant, CardMediaPosition } from './components/Card'
 
@@ -34,6 +37,9 @@ export type { TextareaProps } from './components/Textarea'
 
 export { Select } from './components/Select'
 export type { SelectProps } from './components/Select'
+
+export { Combobox } from './components/Combobox'
+export type { ComboboxProps, ComboboxOption, ComboboxOptionState } from './components/Combobox'
 
 export { Checkbox } from './components/Checkbox'
 export type { CheckboxProps } from './components/Checkbox'
@@ -65,11 +71,26 @@ export type { EmptyStateProps, EmptyStateTitleAs } from './components/EmptyState
 export { Stepper, Wizard } from './components/Stepper'
 export type { StepperProps, Step, StepStatus, StepperOrientation, WizardProps, WizardStep, WizardApi } from './components/Stepper'
 
+export { AppShell, Navbar, Sidebar, useAppShell } from './components/AppShell'
+export type { AppShellProps, NavbarProps, SidebarProps, SidebarItem, AppShellState } from './components/AppShell'
+
+export { Tabs } from './components/Tabs'
+export type { TabsProps, TabItem, TabsVariant, TabsSize } from './components/Tabs'
+
+export { Breadcrumbs } from './components/Breadcrumbs'
+export type { BreadcrumbsProps, BreadcrumbItem, RenderLink } from './components/Breadcrumbs'
+
+export { Accordion } from './components/Accordion'
+export type { AccordionProps, AccordionItem, AccordionVariant } from './components/Accordion'
+
 export { Modal } from './components/Modal'
 export type { ModalProps, ModalSize, ModalCloseProps } from './components/Modal'
 
 export { Drawer } from './components/Drawer'
 export type { DrawerProps, DrawerSide, DrawerSize, DrawerCloseProps } from './components/Drawer'
+
+export { Pagination, pageWindow } from './components/Pagination'
+export type { PaginationProps, PaginationSize, PageWindowItem } from './components/Pagination'
 
 export { Table } from './components/Table'
 export type {
