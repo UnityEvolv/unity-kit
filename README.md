@@ -358,6 +358,43 @@ pinned to the edge of a page rather than floating on it as a card. It is a prop 
 than a second component, because a `Banner` would be an `Alert` with two class names
 changed, and two names for one thing drift apart.
 
+## Toasts
+
+`toast` is one call from anywhere; `Toaster` is mounted once at the app root and owns the
+stack. Consumers hold no toast state.
+
+```tsx
+// App root, once
+import { Toaster } from '@unityevolv/unitykit'
+<Toaster position="bottom-right" />
+
+// Anywhere — a handler, a data layer, a route loader
+import { toast } from '@unityevolv/unitykit'
+
+toast.success('Room created', { description: 'Reception is ready to use.' })
+toast.error('Could not join', { action: { label: 'Retry', onClick: retry } })
+toast.warning('Storage almost full')
+toast.info('Sasha joined the call')
+
+const id = toast.loading('Saving…')
+toast.success('Saved', { id })              // same id updates in place
+toast.dismiss(id)                           // or toast.dismiss() for all
+
+toast.promise(save(), { loading: 'Saving…', success: 'Saved', error: 'Could not save' })
+```
+
+Underneath is [sonner](https://sonner.emilkowal.ski/): stacking, swipe-to-dismiss, pause
+on hover, queueing and the `aria-live` region are its, because those have more edge cases
+than they look. Each toast is dressed as a daisyUI `alert` in the kit's own icons, so a
+toast and an `Alert` for the same event look the same. The kit's `theme.css` imports
+sonner's positioning stylesheet, so nothing extra is needed in the app.
+
+`toast.success` / `error` / `warning` / `info` are function names, not variant props,
+which is why they do not follow `Alert`'s `ok` / `warn` / `danger`.
+
+Use a toast for feedback about something that just happened and needs no reply. A message
+that belongs on the page — a locked form, a failed load — is an `Alert`.
+
 ## Form primitives
 
 `Input`, `Textarea`, `Select`, `Checkbox`, `Radio` and `Toggle`, all rendering through one
