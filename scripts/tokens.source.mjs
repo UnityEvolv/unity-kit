@@ -1,10 +1,10 @@
 /**
- * The single source of truth for the UnityEvolv brand palette (UKIT-29).
+ * The web wiring for the UnityEvolv brand palette (UKIT-29, UKIT-11).
  *
- * Nothing else in the repository holds these values by hand. `src/tokens.ts`,
- * `src/tokens.css` and `src/theme.css` are all generated from this file by
- * `scripts/generate-tokens.mjs`, and CI fails if they drift, so a colour can
- * only ever be changed in one place.
+ * The values live in `src/tokens.json`; nothing else in the repository holds
+ * them by hand. `src/tokens.ts`, `src/tokens.css` and `src/theme.css` are all
+ * generated from the JSON through this module by `scripts/generate-tokens.mjs`,
+ * and CI fails if they drift, so a colour can only ever be changed in one place.
  *
  * Two hues and the status colours are the whole palette. There is no accent
  * token: a third hue collided with `warn`, and the app's main screen is a
@@ -22,118 +22,32 @@
  * every dark pair already passes.
  */
 
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
+/**
+ * The brand values themselves live in `src/tokens.json` (UKIT-11): a
+ * platform-neutral file a consumer outside React can read with no build
+ * step, exported from the package as `@unityevolv/unitykit/tokens.json`.
+ * This module reads it and adds the web-specific wiring below — how the
+ * brand maps onto daisyUI's names, which utilities alias which variable, and
+ * which pairs must clear AA. Those are the kit's business, not the palette's.
+ */
+export const tokensJson = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../src/tokens.json', import.meta.url)), 'utf8'),
+)
+
 /** Colour tokens, per theme. Every value is a literal hex string. */
-export const palette = {
-  light: {
-    bg: '#FAF8FC',
-    surface: '#FFFFFF',
-    'surface-raised': '#FFFFFF',
-    line: '#E6E1EE',
-    ink: '#1B1A1F',
-    muted: '#6B6577',
-    primary: '#7A3FD6',
-    'primary-hover': '#6A33BF',
-    'primary-ink': '#FFFFFF',
-    secondary: '#0C798A',
-    'secondary-hover': '#0B7686',
-    'secondary-ink': '#FFFFFF',
-    danger: '#BE4736',
-    'danger-hover': '#AD4232',
-    'danger-ink': '#FFFFFF',
-    'status-ink': '#FFFFFF',
-    ok: '#297D4E',
-    warn: '#966319',
-    info: '#0C798A',
-    focus: '#7A3FD666',
-
-    /*
-     * Avatar identity tints. Six, not a rainbow: the palette is two hues, and
-     * an avatar colour that is neither violet nor teal would be the third hue
-     * UKIT-29 removed. Each hue therefore appears twice — vivid and muted —
-     * which buys separation from lightness instead of from a new colour.
-     *
-     * Measured with CIEDE2000, the closest pair is 15.3 apart. That is wide
-     * enough to tell two people apart at a glance, and every tint clears AA
-     * against its own ink, which `contrastPairs` below enforces.
-     */
-    'avatar-1': '#7A3FD6',
-    'avatar-2': '#DCC6FA',
-    'avatar-3': '#2D62A5',
-    'avatar-4': '#AFCCF5',
-    'avatar-5': '#0C798A',
-    'avatar-6': '#93D4DE',
-    'avatar-ink-vivid': '#FFFFFF',
-    'avatar-ink-muted': '#1B1A1F',
-  },
-  dark: {
-    bg: '#121212',
-    surface: '#1C1B20',
-    'surface-raised': '#26242C',
-    line: '#2E2C35',
-    ink: '#FFFFFF',
-    muted: '#A9A3B5',
-    primary: '#C27FFF',
-    'primary-hover': '#D29BFF',
-    'primary-ink': '#121212',
-    secondary: '#25E0F8',
-    'secondary-hover': '#5CE8FA',
-    'secondary-ink': '#121212',
-    danger: '#F06A6A',
-    'danger-hover': '#F58585',
-    'danger-ink': '#121212',
-    'status-ink': '#121212',
-    ok: '#5CD68C',
-    warn: '#F2B84B',
-    info: '#25E0F8',
-    focus: '#C27FFF66',
-
-    /*
-     * The same six slots, one hue each, inverted for a dark page: the vivid
-     * slots become the light ones and the muted slots the deep ones, so a
-     * person keeps their hue when the theme changes even though the value
-     * does not. Closest pair here is 17.8.
-     */
-    'avatar-1': '#C27FFF',
-    'avatar-2': '#5B2E99',
-    'avatar-3': '#6FB4FF',
-    'avatar-4': '#23508C',
-    'avatar-5': '#25E0F8',
-    'avatar-6': '#10646F',
-    'avatar-ink-vivid': '#121212',
-    'avatar-ink-muted': '#FFFFFF',
-  },
-}
+export const palette = tokensJson.color
 
 /** Non-colour scales, shared by the kit and its consumers. */
 export const scales = {
-  font: {
-    sans: '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
-    mono: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
-  },
-  text: {
-    xs: ['0.75rem', '1rem'],
-    sm: ['0.875rem', '1.25rem'],
-    base: ['1rem', '1.5rem'],
-    lg: ['1.125rem', '1.75rem'],
-    xl: ['1.25rem', '1.75rem'],
-    '2xl': ['1.5rem', '2rem'],
-    '3xl': ['1.875rem', '2.25rem'],
-  },
-  radius: { sm: '4px', md: '6px', lg: '8px', xl: '12px', full: '999px' },
-  /*
-   * The two units every daisyUI control is measured in. `field` scales inputs,
-   * selects and textareas; `selector` scales checkboxes, radios and toggles.
-   * daisyUI falls back to 0.25rem when a theme says nothing, which means the
-   * control heights come from the library rather than from the brand — so the
-   * theme states them, and one edit here moves every control together.
-   */
-  size: { field: '0.25rem', selector: '0.25rem' },
-  shadow: {
-    sm: '0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 3px 0 rgb(0 0 0 / 0.10)',
-    md: '0 4px 6px -1px rgb(0 0 0 / 0.10), 0 2px 4px -2px rgb(0 0 0 / 0.06)',
-  },
-  /** Tailwind v4 derives every spacing utility from this single base step. */
-  space: '0.25rem',
+  font: tokensJson.font,
+  text: tokensJson.text,
+  radius: tokensJson.radius,
+  size: tokensJson.size,
+  shadow: tokensJson.shadow,
+  space: tokensJson.space,
 }
 
 /**
