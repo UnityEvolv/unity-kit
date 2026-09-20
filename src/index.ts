@@ -38,6 +38,9 @@ export type { TextareaProps } from './components/Textarea'
 export { Select } from './components/Select'
 export type { SelectProps } from './components/Select'
 
+export { Combobox } from './components/Combobox'
+export type { ComboboxProps, ComboboxOption, ComboboxOptionState } from './components/Combobox'
+
 export { Checkbox } from './components/Checkbox'
 export type { CheckboxProps } from './components/Checkbox'
 

@@ -84,10 +84,14 @@ const mergeable = (node: ReactNode) => isValidElement(node)
  * container drawing a focus ring around itself reads as an error rather than
  * as a position.
  *
+ * Exported for `Combobox`, which anchors a Radix popover of its own and must
+ * look like this one; not exported from the package, since it hands out daisyUI
+ * class names a consumer should never hold.
+ *
  * The z-index matches daisyUI's overlay layer (999) so a popover opens above a
  * `Modal` instead of behind it.
  */
-const PANEL =
+export const PANEL =
   'card card-sm z-[999] border border-base-300 bg-base-100 text-base-content shadow-md focus:outline-none'
 
 export function Popover({
@@ -114,9 +118,7 @@ export function Popover({
           align={align}
           sideOffset={sideOffset}
           collisionPadding={8}
-          onOpenAutoFocus={
-            autoFocusContent ? undefined : (event) => event.preventDefault()
-          }
+          onOpenAutoFocus={autoFocusContent ? undefined : (event) => event.preventDefault()}
         >
           {padded ? <div className="card-body">{children}</div> : children}
         </RadixPopover.Content>

@@ -466,6 +466,55 @@ of radios or checkboxes, and `disabled` then disables every control inside it na
 react-hook-form's `register()` spreads onto any of these and a plain `<form>` reads them by
 name. The kit depends on no form library and never will.
 
+## Combobox
+
+`Combobox` is a text input that filters a list, for picking one option or several from a
+set too long for a `Select`. `Select` stays for a short, fixed list: it is native, and
+native opens best on a phone.
+
+```tsx
+import { Combobox } from '@unityevolv/unitykit'
+import type { ComboboxOption } from '@unityevolv/unitykit'
+
+interface Person extends ComboboxOption { email: string }   // extend with what you render
+
+<Combobox label="Owner" options={people} value={owner} onChange={setOwner} />
+
+<Combobox label="Attendees" options={people} multiple value={ids} onChange={setIds} />
+
+// Fetch on type: with onSearch the kit does no filtering of its own
+<Combobox
+  label="City"
+  options={results}
+  onSearch={(q) => fetchCities(q)}
+  loading={pending}
+  emptyMessage="No city by that name"
+/>
+
+// Your own row
+<Combobox
+  label="Person"
+  options={people}
+  renderOption={(p, { selected }) => (
+    <span className="flex items-center gap-2">
+      <Avatar name={p.label} size="xs" />
+      <span>{p.label} <span className="text-muted">{p.email}</span></span>
+    </span>
+  )}
+/>
+```
+
+- **The ARIA combobox pattern, with active descendant.** Focus stays in the input the
+  whole time; the arrow keys move a highlight the input points at with
+  `aria-activedescendant`. Arrow keys open and move, Home/End jump, Enter picks, Escape
+  closes and restores the chosen label, Tab closes.
+- **Multi-select renders chips** with a remove button each; Backspace on an empty input
+  removes the last one. The list stays open while picking several.
+- **Empty and loading live inside the list** as `role="status"` lines, so they are
+  announced.
+- **Field wiring is the same as every other control**: `label`, `help`, `error`,
+  `required`, `disabled`, `size`. `name` renders hidden inputs for a plain `<form>`.
+
 ## Brand
 
 A product's identity — the monogram, then the product name in two tones, the way
