@@ -53,4 +53,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # setup-node's registry-url writes an .npmrc holding
+          # _authToken=${NODE_AUTH_TOKEN} and points NPM_CONFIG_USERCONFIG at
+          # it, which overrides the ~/.npmrc the changesets action writes from
+          # NPM_TOKEN. Without this line npm publish authenticates as nobody
+          # and fails with a 401. Both names carry the same secret.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
