@@ -340,6 +340,26 @@ phone a row of metrics runs off the edge instead of reflowing. Stacking is daisy
 answer and it is the default here so a dashboard row survives a narrow viewport without
 the consumer thinking about it; `horizontal` and `vertical` pin it.
 
+## Pagination
+
+`Pagination` is daisyUI `join` around the kit's own `Button`s; the page-window logic is
+the kit's own in `pageWindow.ts`, tested on its own without rendering anything.
+
+- **The window has a constant width.** Near an edge the slack moves to the other side
+  instead of disappearing, so the strip never changes length as the user pages and
+  nothing under the cursor jumps. An ellipsis only ever hides two or more pages; a gap
+  of one page shows the page. `pageWindow.test.ts` pins both.
+- **The current page is a focusable button**, marked `aria-current="page"` and drawn
+  primary. Making it a span would drop it from the tab order and break arrowing along
+  the row. The ellipsis is a disabled ghost button with `aria-hidden` and `tabIndex=-1`,
+  so it takes the same space as a page and says nothing.
+- **Controlled only.** `page`, `pageSize` and the callbacks come from the consumer;
+  `pageCount` derives from `total / pageSize` when omitted. A `page` outside the range is
+  clamped for rendering rather than trusted.
+- **The page-size selector is a plain `select` in a wrapping `label`**, not the kit's
+  `Select`: that component stacks its label above the control, and a strip wants the
+  label beside it.
+
 ## Overlays
 
 `Modal`, `Drawer`, `Dropdown`, `Popover` and `Tooltip` are Radix primitives wearing daisyUI

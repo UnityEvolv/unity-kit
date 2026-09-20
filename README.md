@@ -414,6 +414,37 @@ rendering `Brand` into one.
 > `src/components/Brand/marks.tsx` when the vector artwork exists; nothing outside that
 > file changes, because `Brand` only ever asks for a mark at a height.
 
+## Pagination
+
+`Pagination` moves through a long list page by page. It is controlled throughout — the
+caller owns `page` and `pageSize`, slices or fetches accordingly, and hands the result to
+whatever sits above. It is designed to sit under `Table` but nothing couples them.
+
+```tsx
+import { Pagination } from '@unityevolv/unitykit'
+
+<Pagination
+  page={page}
+  onPageChange={setPage}
+  total={result.total}                // with pageSize, derives the page count
+  pageSize={pageSize}                 //   and turns on "Showing 21 to 30 of 145"
+  pageSizeOptions={[10, 25, 50]}      // renders a "Rows per page" selector
+  onPageSizeChange={(n) => { setPageSize(n); setPage(1) }}
+/>
+
+<Pagination page={page} pageCount={12} onPageChange={setPage} compact />
+```
+
+- **The window keeps a constant width.** First and last page always show, the current
+  page with one sibling each side, and an ellipsis where pages are skipped — but the
+  slack moves to the other end near an edge rather than disappearing, so the row does
+  not change length as the user pages. `siblings` and `boundaries` widen it. The
+  algorithm is exported as `pageWindow` for anything that renders its own controls.
+- **The current page is a button with `aria-current="page"`,** not a span, so it keeps
+  its place in the tab order. The ellipsis is hidden from assistive technology.
+- **`compact`** renders previous, next and "Page 7 of 20", for a strip with no room.
+- The whole thing is a `nav` landmark. Give each one on a page its own `label`.
+
 ## Waiting and nothing-here states
 
 Four components, and the first decision is which one the screen actually needs.
