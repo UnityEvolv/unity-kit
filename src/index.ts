@@ -68,6 +68,9 @@ export type { ProgressProps, ProgressVariant } from './components/Progress'
 export { EmptyState } from './components/EmptyState'
 export type { EmptyStateProps, EmptyStateTitleAs } from './components/EmptyState'
 
+export { Stepper, Wizard } from './components/Stepper'
+export type { StepperProps, Step, StepStatus, StepperOrientation, WizardProps, WizardStep, WizardApi } from './components/Stepper'
+
 export { AppShell, Navbar, Sidebar, useAppShell } from './components/AppShell'
 export type { AppShellProps, NavbarProps, SidebarProps, SidebarItem, AppShellState } from './components/AppShell'
 

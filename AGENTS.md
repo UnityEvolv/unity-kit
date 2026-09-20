@@ -532,6 +532,22 @@ table or a list of `Card`s. Decisions that are easy to undo by accident:
   table's. The `checkbox` inputs are plain daisyUI inputs with `aria-label`, because a
   cell has no room for a visible label.
 
+## Stepper and Wizard
+
+- **daisyUI `steps` is pure CSS**: counters for the numbers, `:before` for the connector,
+  `step-primary` / `step-error` for colour. A `step-icon` child replaces the number, which
+  is how complete gets a check and error a mark, so state is never colour alone. The
+  spoken state is `sr-only` text after the label.
+- **The list is an `ol`** so "step 2 of 5" comes for free, and the current item carries
+  `aria-current="step"`.
+- **Only steps a user may reach are buttons.** Rendering every step as a button and
+  ignoring the click would present controls that do nothing. Completed and error steps are
+  buttons when `onStepClick` is given; upcoming ones only with `allowUpcoming`.
+- **`Wizard` holds the index and nothing else.** Validation is the consumer's;
+  `canProceed` is the single gate, refused both by the Next button and by `goTo` for any
+  forward jump, while Back always works. Controls go to content and footer as render-prop
+  arguments rather than through context.
+
 ## Styling conventions
 
 - Use daisyUI semantic tokens (`bg-primary`, `text-base-content`), never raw Tailwind
