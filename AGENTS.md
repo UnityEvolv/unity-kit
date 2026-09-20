@@ -1,6 +1,7 @@
 # AGENTS.md
 
-Working conventions for this repository. Read before making changes.
+Working conventions for this repository. Read before making changes. `CONTRIBUTING.md` is
+the short checklist for a first contribution; this file holds the reasoning behind it.
 
 ## What this package is
 
