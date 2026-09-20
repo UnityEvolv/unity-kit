@@ -186,6 +186,16 @@ variant that should be in the config.
 - **`TimePicker` is a `fieldset` through `Field`** so the label names the group, and each
   segment carries its own `aria-label`. The AM/PM control is a native `select`.
 
+- **`DateRangePicker` is two `Calendar`s, not a new grid.** Range support lives in the
+  Calendar as `range`, `onHoverDate`, `hideOutsideDays` and `navigation` props; the band
+  is drawn on the `gridcell` wrapper (`bg-primary/10`, rounded at the ends) so the day
+  button keeps its own selected and focus styling. The second month is the same component
+  one month on, so keyboard and locale behaviour cannot drift. It is hidden below `sm`
+  with `hidden sm:block`, which removes it from the accessibility tree too.
+- **The preview follows focus as well as the pointer.** `Calendar` reports the day under
+  the pointer and the day the arrows land on through the same `onHoverDate`, so a keyboard
+  user sees the band grow before pressing Enter.
+
 ## Icons
 
 Every icon goes through `<Icon name="..." />`. `src/components/Icon/icons.ts` is the only

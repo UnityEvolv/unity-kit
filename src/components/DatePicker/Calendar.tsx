@@ -38,6 +38,17 @@ export interface CalendarProps {
   autoFocus?: boolean
   /** Names the grid. Defaults to the visible month, e.g. "March 2026". */
   label?: string
+  /**
+   * A span to draw as a band, for `DateRangePicker`. Both ends are marked
+   * selected; days between get the band. Either end may be missing.
+   */
+  range?: { start: ISODate | null; end: ISODate | null }
+  /** The day under the pointer or focus, so a range can be previewed. `null` on leave. */
+  onHoverDate?: (date: ISODate | null) => void
+  /** Leaves adjacent-month cells empty, for two months side by side. */
+  hideOutsideDays?: boolean
+  /** Which month arrows to draw. Defaults to `both`. */
+  navigation?: 'both' | 'previous' | 'next' | 'none'
   className?: string
 }
 
@@ -51,6 +62,11 @@ const CELL =
   'flex size-9 items-center justify-center rounded-full text-sm text-base-content hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary aria-selected:bg-primary aria-selected:text-primary-content aria-selected:hover:bg-primary aria-disabled:cursor-not-allowed aria-disabled:opacity-40 aria-disabled:hover:bg-transparent aria-[current=date]:font-bold aria-[current=date]:underline aria-[current=date]:underline-offset-4'
 
 const OUTSIDE = 'text-muted'
+
+/** The band between two ends of a range, drawn on the cell rather than the button. */
+const IN_RANGE = 'bg-primary/10'
+const RANGE_START = 'rounded-l-full'
+const RANGE_END = 'rounded-r-full'
 
 const YEARS_AROUND = 60
 
@@ -76,6 +92,10 @@ export function Calendar({
   onEscape,
   autoFocus = false,
   label,
+  range,
+  onHoverDate,
+  hideOutsideDays = false,
+  navigation = 'both',
   className,
 }: CalendarProps) {
   const today = todayISO()
@@ -102,6 +122,13 @@ export function Calendar({
     (max !== undefined && compareISO(iso, max) > 0) ||
     (isDateDisabled?.(iso) ?? false)
 
+  const rangeStart = range?.start ?? null
+  const rangeEnd = range?.end ?? null
+  const inRange = (iso: ISODate) =>
+    rangeStart !== null && rangeEnd !== null && iso >= rangeStart && iso <= rangeEnd
+  const isSelected = (iso: ISODate) =>
+    range ? iso === rangeStart || iso === rangeEnd : value === iso
+
   // The one focusable cell: the selection if it is showing, else today if it
   // is showing, else the first of the month.
   const [focused, setFocused] = useState<ISODate>(() =>
@@ -127,6 +154,7 @@ export function Calendar({
 
   const moveTo = (iso: ISODate) => {
     const next = clampISO(iso, min, max)
+    onHoverDate?.(next)
     pendingFocus.current = true
     setFocused(next)
     if (firstOfMonth(next) !== visible) setVisible(next)
@@ -178,14 +206,18 @@ export function Calendar({
   return (
     <div className={['inline-flex w-72 flex-col gap-2 p-3', className ?? ''].join(' ').trim()}>
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          icon="chevron-left"
-          aria-label="Previous month"
-          disabled={!canGo(-1)}
-          onClick={() => setVisible(addMonths(visible, -1))}
-        />
+        {navigation === 'both' || navigation === 'previous' ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="chevron-left"
+            aria-label="Previous month"
+            disabled={!canGo(-1)}
+            onClick={() => setVisible(addMonths(visible, -1))}
+          />
+        ) : (
+          <span className="size-8" aria-hidden="true" />
+        )}
         <label className="sr-only" htmlFor={`${selectId}-month`}>
           Month
         </label>
@@ -220,14 +252,18 @@ export function Calendar({
             </option>
           ))}
         </select>
-        <Button
-          variant="ghost"
-          size="sm"
-          icon="chevron-right"
-          aria-label="Next month"
-          disabled={!canGo(1)}
-          onClick={() => setVisible(addMonths(visible, 1))}
-        />
+        {navigation === 'both' || navigation === 'next' ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="chevron-right"
+            aria-label="Next month"
+            disabled={!canGo(1)}
+            onClick={() => setVisible(addMonths(visible, 1))}
+          />
+        ) : (
+          <span className="size-8" aria-hidden="true" />
+        )}
       </div>
 
       <div
@@ -235,6 +271,7 @@ export function Calendar({
         role="grid"
         aria-label={label ?? monthLabel}
         onKeyDown={onKeyDown}
+        onMouseLeave={onHoverDate ? () => onHoverDate(null) : undefined}
         className="grid grid-cols-7 gap-y-1"
       >
         <div role="row" className="contents">
@@ -253,20 +290,33 @@ export function Calendar({
           <div key={weekIndex} role="row" className="contents">
             {week.map((iso) => {
               const outside = iso.slice(0, 7) !== visible.slice(0, 7)
+              if (outside && hideOutsideDays) {
+                return <div key={iso} role="gridcell" aria-hidden="true" className="size-9" />
+              }
               const isDisabled = disabled(iso)
+              const banded = inRange(iso)
+              const cellClass = [
+                'flex justify-center',
+                banded ? IN_RANGE : '',
+                banded && iso === rangeStart ? RANGE_START : '',
+                banded && iso === rangeEnd ? RANGE_END : '',
+              ]
+                .join(' ')
+                .trim()
               return (
-                <div key={iso} role="gridcell" className="flex justify-center">
+                <div key={iso} role="gridcell" className={cellClass}>
                   <button
                     type="button"
                     data-date={iso}
                     tabIndex={iso === active ? 0 : -1}
-                    aria-selected={value === iso}
+                    aria-selected={isSelected(iso)}
                     aria-disabled={isDisabled || undefined}
                     aria-current={iso === today ? 'date' : undefined}
                     aria-label={formatISODate(iso, locale, { dateStyle: 'full' })}
                     className={outside ? `${CELL} ${OUTSIDE}` : CELL}
                     onClick={() => pick(iso)}
                     onFocus={() => setFocused(iso)}
+                    onMouseEnter={onHoverDate ? () => onHoverDate(iso) : undefined}
                   >
                     {Number(iso.slice(8))}
                   </button>
