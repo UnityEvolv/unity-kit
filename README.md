@@ -2,12 +2,47 @@
 
 [![CI](https://github.com/UnityEvolv/unity-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/UnityEvolv/unity-kit/actions/workflows/ci.yml)
 
-Browse every component live at [unityevolv.com/unity-kit](https://unityevolv.com/unity-kit/).
-
 Shared React component library for UnityEvolv, built on Tailwind CSS v4 and daisyUI 5.
 
 The kit has no knowledge of any consuming application. It ships components, a theme and
 its tokens; consuming apps supply their own data, routing and behaviour.
+
+## Quick start
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
+  <img alt="unitykit components: navbar, buttons, form fields, a table, stats and an alert, in the UnityEvolv theme" src="docs/screenshot-light.png" width="1200">
+</picture>
+
+```bash
+npm install @unityevolv/unitykit
+```
+
+Three lines in your CSS entry point — the `@source` line is what lets Tailwind see the
+kit's class names, and without it everything renders unstyled with no error:
+
+```css
+@import "tailwindcss";
+@import "@unityevolv/unitykit/theme.css";
+@source "../node_modules/@unityevolv/unitykit/dist";
+```
+
+Then import and render:
+
+```tsx
+import { Button, Alert } from '@unityevolv/unitykit'
+
+export function Welcome() {
+  return (
+    <Alert variant="ok" title="You are in" action={<Button size="sm">Open the office</Button>}>
+      Everything below is themed, accessible and typed.
+    </Alert>
+  )
+}
+```
+
+Browse every component live at [unityevolv.com/unity-kit](https://unityevolv.com/unity-kit/).
+MIT licensed — see [LICENSE](./LICENSE).
 
 ## Install
 
