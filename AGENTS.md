@@ -275,6 +275,30 @@ Every control renders through `Field`. Nothing in the kit draws its own label.
   `WithSampleProps` from `src/components/sampleProps.ts` to type a `forwardRef` component
   that carries the static.
 
+## Combobox
+
+`Combobox` is the ARIA combobox pattern written by hand over a Radix Popover used for
+positioning only. The listbox behaviour is the kit's.
+
+- **Radix `Anchor`, not `Trigger`.** A trigger toggles on click and announces itself as
+  opening a dialog; both are wrong for a field you type into. The panel gets
+  `onOpenAutoFocus` and `onCloseAutoFocus` prevented so focus never leaves the input, and
+  `onInteractOutside` ignores the input's own box so clicking into it does not close the
+  list. It reuses `PANEL` from `Popover.tsx` (an internal export) so the two look alike.
+- **Focus stays in the input; the highlight is `aria-activedescendant`.** Options are
+  `li[role=option]` with `aria-selected` and `aria-disabled`; the highlight is a
+  `data-active` attribute styled with a Tailwind data variant. Nothing in the list is
+  focusable. `onMouseDown` on an option is prevented so a click does not blur the input.
+- **A typed query filters; an opened value does not.** Opening on a chosen option shows
+  its label in the input without hiding every other option (`typed` flag). Escape restores
+  the label. With `onSearch` the kit filters nothing and calls it with `''` on open.
+- **The outer box is daisyUI `input` with its height released** (`h-auto flex-wrap`), so
+  chips wrap. `input-error` follows the Field's `aria-invalid`, as every control does.
+- **Generic over the option type.** `ComboboxOption` is the floor (`value`, `label`,
+  `description?`, `disabled?`); consumers extend it and get their type back in
+  `renderOption` and `onChange`. `Combobox` is a plain generic function, not `forwardRef`,
+  for the same reason `Table` is.
+
 ## Brand
 
 `Brand` renders a product's identity: the monogram, then the name split across the
