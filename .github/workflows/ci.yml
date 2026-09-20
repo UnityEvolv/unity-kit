@@ -56,7 +56,11 @@ jobs:
     # Every PR that changes the package declares its bump level at PR time
     # (UKIT-27), so the changelog writes itself and the release never guesses.
     # A docs-only change adds an empty one: npx changeset add --empty.
-    if: github.event_name == 'pull_request'
+    #
+    # The Version Packages PR is the one exception, and is skipped. Changesets
+    # opens it to consume the pending changeset files, so by construction it
+    # changes the package and has none left — exactly what this gate fails on.
+    if: github.event_name == 'pull_request' && github.head_ref != 'changeset-release/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
