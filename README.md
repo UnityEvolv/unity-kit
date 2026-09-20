@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/UnityEvolv/unity-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/UnityEvolv/unity-kit/actions/workflows/ci.yml)
 
+Browse every component live at [unityevolv.com/unity-kit](https://unityevolv.com/unity-kit/).
+
 Shared React component library for UnityEvolv, built on Tailwind CSS v4 and daisyUI 5.
 
 The kit has no knowledge of any consuming application. It ships components, a theme and
@@ -684,6 +686,10 @@ Two things it does *not* catch:
 Use `npm run blind-test -- --keep` to leave the generated app in place for inspection.
 
 ## Storybook
+
+**Live:** [unityevolv.com/unity-kit](https://unityevolv.com/unity-kit/) — every component, in both
+themes, rebuilt from `main` on every push by the Storybook workflow. A broken build never
+replaces the live site: the deploy job only runs after the static build succeeds.
 
 ```bash
 npm run storybook        # dev server on :6006
