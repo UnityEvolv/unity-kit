@@ -269,7 +269,25 @@ import { DatePicker, TimePicker, DateTimePicker, Calendar } from '@unityevolv/un
 - **`DateTimePicker` is where zones enter.** It shows the wall clock of `timeZone`,
   converts through `Intl` with that zone, and never through local time.
 
-Date ranges are a separate component (UKIT-21).
+### Date ranges
+
+`DateRangePicker` is start and end in one control, on the same `Calendar`. Value in and
+out is a pair: `['2026-03-08', '2026-03-14']`, with `null` for an end not chosen yet.
+
+```tsx
+<DateRangePicker
+  label="Report period"
+  value={range} onChange={setRange}                         // ['YYYY-MM-DD', 'YYYY-MM-DD']
+  presets={[{ label: 'Last 7 days', range: [weekAgo, today] }]}   // yours; the kit ships none
+  min="2026-01-01" isDateDisabled={isHoliday}
+/>
+```
+
+Pick a start, then an end; pointing or arrowing across the grid previews the band, and a
+click before the start begins again from there. Two months sit side by side above `sm`
+and one below it. The range is announced as "8 March 2026 to 14 March 2026" on the
+trigger and in a live region when it completes. Time ranges are out of scope: compose two
+`DateTimePicker`s.
 
 ## Icons
 
