@@ -1,7 +1,7 @@
 /*
  * GENERATED FILE — do not edit.
  *
- * Written by scripts/generate-tokens.mjs from scripts/tokens.source.mjs.
+ * Written by scripts/generate-tokens.mjs from src/tokens.json.
  * Change a colour there and run `npm run tokens`; CI fails if this file is
  * edited directly or left stale.
  */

@@ -108,5 +108,6 @@ export type {
 } from './components/Tooltip'
 
 export { tokens, scales, contrastPairs, AA_TEXT } from './tokens'
+export { default as themeTokens } from './tokens.json'
 export type { ThemeName, ColorToken } from './tokens'
 export { contrastRatio, relativeLuminance, meetsAA } from './contrast'

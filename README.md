@@ -86,10 +86,30 @@ Apps that want only the values, with no daisyUI, can import them alone:
 @import "@unityevolv/unitykit/tokens.css";   /* --ue-primary, --ue-ink, ... */
 ```
 
+### Tokens as JSON, for anything that is not React
+
+`src/tokens.json` is the source of the palette and is published as
+`@unityevolv/unitykit/tokens.json`. It is plain data — hex colours per theme, the role
+names, radii, type, size, shadow and spacing scales — so a native app, a design tool, an
+email template or a Remotion composition can read it with no build step and no
+dependency on the components.
+
+```ts
+import themeTokens from '@unityevolv/unitykit/tokens.json'   // or: import { themeTokens } from '@unityevolv/unitykit'
+
+themeTokens.color.dark.primary      // '#C27FFF'
+themeTokens.roles.error             // 'danger'  → themeTokens.color.light.danger
+themeTokens.radius.md               // '6px'
+```
+
+This is the supported way to consume unitykit tokens outside React. The kit does not know
+what you do with it and ships no mapping for any platform; that belongs with the consumer.
+
 ### One source, generated three ways
 
-Every value lives in `scripts/tokens.source.mjs`. `src/tokens.ts`, `src/tokens.css` and
-`src/theme.css` are generated from it by `npm run tokens`, and CI fails if a generated file
+Every value lives in `src/tokens.json`. `src/tokens.ts`, `src/tokens.css` and
+`src/theme.css` are generated from it (through `scripts/tokens.source.mjs`, which adds the
+daisyUI mapping and the contrast pairs) by `npm run tokens`, and CI fails if a generated file
 is stale or hand-edited. The palette exists in three forms because consumers need all
 three, and three hand-kept copies drift — usually the one the contrast page reads, so the
 page ends up reporting a number the build does not ship.
@@ -406,7 +426,7 @@ A form doing its own validation turns the browser's bubbles off with `noValidate
 `xs` through `lg`, and every one of them resolves to daisyUI's `--size-field` (inputs,
 selects, textareas) or `--size-selector` (checkboxes, radios, toggles). Both are now stated
 in the generated theme rather than left to daisyUI's fallback, so one edit in
-`scripts/tokens.source.mjs` moves every control together.
+`src/tokens.json` moves every control together.
 
 ### Field on its own
 
@@ -705,7 +725,7 @@ CI builds every story, so a broken story fails the PR.
 | --- | --- |
 | `npm run build` | Build `dist/` — ESM bundle, `.d.ts` declarations, `theme.css` |
 | `npm run dev` | Same, in watch mode |
-| `npm run tokens` | Regenerate the token files from `scripts/tokens.source.mjs` |
+| `npm run tokens` | Regenerate the token files from `src/tokens.json` |
 | `npm run tokens:check` | Fail if a generated token file is stale or hand-edited |
 | `npm run lint` | ESLint: static class names, and daisyUI naming inside components |
 | `npm run typecheck` | `tsc --noEmit` |
