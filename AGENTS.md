@@ -163,6 +163,29 @@ variant that should be in the config.
   `Avatar` reads it. Cloning would work until someone wrapped an avatar in a tooltip or a
   link, at which point the clone lands on the wrapper and the size vanishes.
 
+## Dates and times
+
+- **All day arithmetic is UTC** (`Date.UTC`, `getUTC*`). Local-time arithmetic loses or
+  gains an hour across a DST change and a grid built on it skips or repeats a day.
+  `date.ts` is the only place that touches `Date`; components deal in `YYYY-MM-DD` and
+  `HH:mm` strings.
+- **No date library.** Names, first weekday, clock, field order, placeholder and zone
+  offsets all come from `Intl.DateTimeFormat` (`formatToParts`, `timeZoneName:
+  'longOffset'`, `Intl.Locale` week info). `date.test.ts` pins each against real locales.
+- **Wall time to instant is a two-read algorithm** (`zonedInstant`): read the offset at
+  the naive guess, apply it, read again, and use the smaller of the two. That lands a
+  skipped spring-forward hour an hour later, as clocks do, and picks the first of a
+  repeated autumn hour.
+- **The Calendar is roving focus, not `aria-activedescendant`.** One cell has
+  `tabIndex=0`; focus follows the active date after a key move through a `data-date`
+  lookup, and `autoFocus` puts it there on mount inside a popover.
+- **`DatePicker` uses the kit's `Popover`** with `padded={false}` and `width="auto"`,
+  opened from its own calendar button (a real trigger); the text input is not the trigger,
+  because typing must not toggle the panel. Picking or Escape closes and returns focus to
+  the input.
+- **`TimePicker` is a `fieldset` through `Field`** so the label names the group, and each
+  segment carries its own `aria-label`. The AM/PM control is a native `select`.
+
 ## Icons
 
 Every icon goes through `<Icon name="..." />`. `src/components/Icon/icons.ts` is the only

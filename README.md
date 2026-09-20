@@ -234,6 +234,43 @@ inconsistency. Four drawn the same way is simpler than two borrowed and two inve
 `onError` swaps to the initials, and a new `src` tries again. A dead avatar URL is the
 most common way this component meets reality, and an empty square is worse than initials.
 
+## Dates and times
+
+`Calendar`, `DatePicker`, `TimePicker` and `DateTimePicker`, built in the kit on
+`Intl.DateTimeFormat` and `Date.UTC` with no date library.
+
+```tsx
+import { DatePicker, TimePicker, DateTimePicker, Calendar } from '@unityevolv/unitykit'
+
+<DatePicker label="Start" value={date} onChange={setDate} min="2026-01-01" />   // 'YYYY-MM-DD'
+<TimePicker label="At" value={time} onChange={setTime} minuteStep={15} />        // 'HH:mm'
+<DateTimePicker
+  label="Meeting"
+  timeZone="Asia/Kolkata"               // edit in the office's zone, not the browser's
+  value={when} onChange={setWhen}       // '2026-03-08T09:30:00+05:30'
+/>
+<Calendar value={date} onChange={setDate} isDateDisabled={(d) => isWeekend(d)} />
+```
+
+- **Values are strings, never `Date`s.** A date is `YYYY-MM-DD`, a time `HH:mm`, and a
+  date-time an ISO 8601 instant with the zone's offset spelled out. A `Date` for a
+  date-only value carries a time and a zone it never had, and "the 8th" becomes the 7th
+  somewhere.
+- **Locale comes from `Intl`.** Month and weekday names, the first day of the week, the
+  12- or 24-hour clock, the typed-date order and the placeholder all follow `locale`,
+  which defaults to the browser's.
+- **The grid is the ARIA grid pattern**: one tab stop, arrows by day and week, Home/End to
+  the week's edges, PageUp/PageDown by month (Shift for a year), Enter picks, Escape
+  closes. Today is `aria-current="date"`, the selection `aria-selected`.
+- **Typing works in `DatePicker`**: a date in the locale's order or ISO is accepted on
+  Enter or blur; anything else marks the field invalid with the pattern shown.
+- **`TimePicker` segments** step with the arrows and jump on typed digits; the value is
+  24-hour whatever the clock shows.
+- **`DateTimePicker` is where zones enter.** It shows the wall clock of `timeZone`,
+  converts through `Intl` with that zone, and never through local time.
+
+Date ranges are a separate component (UKIT-21).
+
 ## Icons
 
 One component, so no app ever imports an icon library directly.
