@@ -72,8 +72,11 @@ which reproduces on the author's machine.
 
 ## Design tokens
 
-The UnityEvolv palette lives in `scripts/tokens.source.mjs` and **nowhere else**.
-`src/tokens.ts`, `src/tokens.css` and `src/theme.css` are generated from it:
+The UnityEvolv palette lives in `src/tokens.json` and **nowhere else**. It is published as
+`@unityevolv/unitykit/tokens.json` for consumers outside React (UKIT-11), so its shape is
+public API. `scripts/tokens.source.mjs` reads it and adds the web-only wiring (daisyUI
+mapping, utility aliases, contrast pairs); `src/tokens.ts`, `src/tokens.css` and
+`src/theme.css` are generated from it:
 
 ```bash
 npm run tokens         # regenerate after changing a value

@@ -5,7 +5,8 @@
  * a typed JavaScript object, and daisyUI theme definitions. Three hand-kept
  * copies drift, and a contrast check that reads the copy rather than the
  * shipped CSS reports a number nobody is actually looking at. So all three are
- * written from `tokens.source.mjs` here, and `npm run tokens:check` fails CI if
+ * written from `src/tokens.json` (through `tokens.source.mjs`) here, and
+ * `npm run tokens:check` fails CI if
  * a generated file has been edited by hand or left stale.
  *
  *   node scripts/generate-tokens.mjs
@@ -43,7 +44,7 @@ const daisyFor = (theme) => ({ ...daisyMap, ...(daisyMapOverrides[theme] ?? {}) 
 
 const quoteKey = (key) => (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key) ? key : `'${key}'`)
 
-const tokensTs = `${BANNER('scripts/tokens.source.mjs')}
+const tokensTs = `${BANNER('src/tokens.json')}
 
 /** The themes unitykit ships. Selected with \`data-theme\` on a root element. */
 export type ThemeName = ${themeNames.map((n) => `'${n}'`).join(' | ')}
@@ -89,7 +90,7 @@ export const AA_TEXT = ${AA_TEXT}
 const brandProps = (theme, indent) =>
   colorTokens.map((t) => `${indent}--ue-${t}: ${palette[theme][t]};`).join('\n')
 
-const tokensCss = `${BANNER('scripts/tokens.source.mjs')}
+const tokensCss = `${BANNER('src/tokens.json')}
 
 /*
  * The brand palette as plain custom properties, for consumers that want the
@@ -144,7 +145,7 @@ ${brandProps(theme, '  ')}
 }`
 }
 
-const themeCss = `${BANNER('scripts/tokens.source.mjs')}
+const themeCss = `${BANNER('src/tokens.json')}
 
 /*
  * unitykit theme.
