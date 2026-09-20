@@ -12,11 +12,18 @@ its tokens; consuming apps supply their own data, routing and behaviour.
 ## Install
 
 ```bash
-npm install github:UnityEvolv/unity-kit#main
+npm install @unityevolv/unitykit
 ```
 
-No registry is involved. `dist/` is not committed — the package builds itself on install
-via the `prepare` script.
+Published to npm from this repository by the release workflow, with provenance, so you can
+pin a version and upgrade deliberately. Versions follow semver and stay on 0.x until the
+component API settles; while on 0.x a breaking change bumps the minor. The changelog is
+[CHANGELOG.md](./CHANGELOG.md), generated from the changesets each pull request adds.
+
+For development against a local checkout, `npm link` is still the loop (see Local
+development). Before the first release, a git dependency also works:
+`npm install github:UnityEvolv/unity-kit#main` builds the package on install through the
+`prepare` script.
 
 ## Usage
 

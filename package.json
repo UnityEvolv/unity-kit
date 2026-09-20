@@ -4,7 +4,8 @@
   "description": "Shared React component library built on Tailwind CSS v4 and daisyUI 5.",
   "license": "MIT",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "type": "module",
   "sideEffects": false,
@@ -41,7 +42,10 @@
     "blind-test": "node scripts/blind-install-test.mjs",
     "prepare": "npm run build",
     "storybook": "storybook dev -p 6006 --no-open",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "npm run build && changeset publish"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",
@@ -61,6 +65,8 @@
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.7.0",
+    "@changesets/cli": "^2.31.1",
     "@eslint/js": "^9.39.5",
     "@storybook/addon-docs": "^10.6.0",
     "@storybook/addon-themes": "^10.6.0",

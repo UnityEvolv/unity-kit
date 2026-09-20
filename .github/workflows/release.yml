@@ -1,0 +1,56 @@
+# Release automation (UKIT-27).
+#
+# On every push to main, Changesets looks at the pending changeset files. If
+# there are any, it opens or updates a "Version Packages" pull request that
+# bumps package.json, writes CHANGELOG.md and deletes the consumed changesets.
+# Nothing is published at that point: the PR is the gate, and small changes
+# batch into one release. Merging that PR is another push to main with no
+# pending changesets, which is when `changeset publish` runs, publishes to npm
+# with provenance and creates the GitHub release from the changelog entry.
+#
+# Needs an NPM_TOKEN secret belonging to the unityevolv npm org with publish
+# rights (an automation token, so 2FA does not block CI). Provenance needs
+# the id-token permission below and a public repository.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  release:
+    name: Version or publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Changesets reads git history to find what changed since the last release.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - name: Create the Version Packages PR, or publish when it has merged
+        uses: changesets/action@v1
+        with:
+          version: npm run version
+          publish: npm run release
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

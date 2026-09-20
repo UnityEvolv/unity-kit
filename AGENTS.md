@@ -26,6 +26,27 @@ Trunk-based development. `main` is always releasable and is not committed to dir
 - **Squash merge** into `main`, which keeps history readable and the generated changelog
   clean once release automation lands.
 
+## Releases
+
+Versioning and publishing are automated with Changesets (UKIT-27). The parts a
+contributor touches:
+
+- **Every PR that changes the package adds a changeset**: `npx changeset`, pick the bump
+  level, describe the change for the changelog. A docs-only PR adds an empty one
+  (`npx changeset add --empty`). CI's "Changeset present" job fails a PR without one.
+- **Semver, on 0.x until the API settles.** While on 0.x a breaking change is a `minor`,
+  a new component or feature a `minor` too, and a fix a `patch`. The first release is
+  0.1.0.
+- **Nothing publishes on merge to main.** The release workflow opens or updates a
+  "Version Packages" PR that bumps `package.json`, rewrites `CHANGELOG.md` from the
+  pending changesets and deletes them. Merging that PR is what publishes to npm
+  (`--access public`, with provenance) and creates the GitHub release. Small changes
+  batch into one release; the PR is the gate.
+- **`CHANGELOG.md` is generated.** Do not edit it by hand; fix the changeset instead.
+- **`npm link` stays the developer loop.** Versions are for consumers.
+- The publishing token (`NPM_TOKEN`) must belong to the `unityevolv` npm org before the
+  first release.
+
 ## Package management
 
 **npm only.** Do not introduce `pnpm-lock.yaml` or `yarn.lock`. Commit `package-lock.json`.
