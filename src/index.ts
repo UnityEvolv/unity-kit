@@ -68,6 +68,19 @@ export type { ModalProps, ModalSize, ModalCloseProps } from './components/Modal'
 export { Drawer } from './components/Drawer'
 export type { DrawerProps, DrawerSide, DrawerSize, DrawerCloseProps } from './components/Drawer'
 
+export { Table } from './components/Table'
+export type {
+  TableProps,
+  TableColumn,
+  TableColumnAlign,
+  TableCardRole,
+  TableLayout,
+  TableSize,
+  TableSort,
+  TableSortDirection,
+  TableRowKey,
+} from './components/Table'
+
 export { Dropdown } from './components/Dropdown'
 export type {
   DropdownProps,
