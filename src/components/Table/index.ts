@@ -1,4 +1,4 @@
-export { Table } from "./Table";
+export { Table } from './Table'
 export type {
   TableProps,
   TableColumn,
@@ -9,4 +9,4 @@ export type {
   TableSort,
   TableSortDirection,
   TableRowKey,
-} from "./Table";
+} from './Table'

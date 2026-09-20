@@ -1,13 +1,13 @@
-import { useEffect, useRef } from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-import type { HTMLAttributes, MouseEvent, ReactNode } from "react";
-import { Alert } from "../Alert";
-import { Button } from "../Button";
-import { Card } from "../Card";
-import { EmptyState } from "../EmptyState";
-import { Icon } from "../Icon";
-import { Skeleton } from "../Skeleton";
-import { useCoarsePointer } from "./useCoarsePointer";
+import { useEffect, useRef } from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
+import type { HTMLAttributes, MouseEvent, ReactNode } from 'react'
+import { Alert } from '../Alert'
+import { Button } from '../Button'
+import { Card } from '../Card'
+import { EmptyState } from '../EmptyState'
+import { Icon } from '../Icon'
+import { Skeleton } from '../Skeleton'
+import { useCoarsePointer } from './useCoarsePointer'
 
 /**
  * Every class name appears here in full: Tailwind scans built files as static
@@ -19,157 +19,149 @@ import { useCoarsePointer } from "./useCoarsePointer";
  * so neither needs a line of JS here. Pinning only shows inside a scrolling
  * ancestor with a bounded height, which is the consumer's container.
  */
-const table = cva("table", {
+const table = cva('table', {
   variants: {
-    size: { xs: "table-xs", sm: "table-sm", md: "table-md", lg: "table-lg" },
-    zebra: { true: "table-zebra", false: "" },
-    pinHeader: { true: "table-pin-rows", false: "" },
+    size: { xs: 'table-xs', sm: 'table-sm', md: 'table-md', lg: 'table-lg' },
+    zebra: { true: 'table-zebra', false: '' },
+    pinHeader: { true: 'table-pin-rows', false: '' },
   },
-  defaultVariants: { size: "md", zebra: false, pinHeader: false },
-});
+  defaultVariants: { size: 'md', zebra: false, pinHeader: false },
+})
 
-type TableVariants = VariantProps<typeof table>;
-export type TableSize = NonNullable<TableVariants["size"]>;
+type TableVariants = VariantProps<typeof table>
+export type TableSize = NonNullable<TableVariants['size']>
 
-export type TableLayout = "auto" | "table" | "cards";
-export type TableColumnAlign = "start" | "end";
-export type TableSortDirection = "asc" | "desc";
-export type TableRowKey = string | number;
+export type TableLayout = 'auto' | 'table' | 'cards'
+export type TableColumnAlign = 'start' | 'end'
+export type TableSortDirection = 'asc' | 'desc'
+export type TableRowKey = string | number
 
 /**
  * What a column becomes when the rows turn into cards. `title` is the card's
  * heading, `body` a labelled line beneath it, `hidden` left out — a status
  * icon that reads fine in a 40px cell is noise as a labelled line.
  */
-export type TableCardRole = "title" | "body" | "hidden";
+export type TableCardRole = 'title' | 'body' | 'hidden'
 
 export interface TableColumn<Row> {
   /** Stable identity, used for sort state and React keys. */
-  key: string;
+  key: string
   /** The column heading, and the label beside the value on a card. */
-  header: ReactNode;
+  header: ReactNode
   /**
    * Renders the cell. Defaults to reading `row[key]` when the key is a
    * property of the row, which covers the plain-text column without a lambda.
    */
-  cell?: (row: Row) => ReactNode;
+  cell?: (row: Row) => ReactNode
   /** Numbers sit at the end so digits line up. Defaults to `start`. */
-  align?: TableColumnAlign;
+  align?: TableColumnAlign
   /** Draws a sort control in the heading. The component never sorts data itself. */
-  sortable?: boolean;
+  sortable?: boolean
   /**
    * The column's job on a card. Defaults to `body`; when no column claims
    * `title`, the first column is the title so a card always has a heading.
    */
-  card?: TableCardRole;
+  card?: TableCardRole
 }
 
 export interface TableSort {
-  key: string;
-  direction: TableSortDirection;
+  key: string
+  direction: TableSortDirection
 }
 
 export interface TableProps<Row> extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  "children" | "onSelect"
+  'children' | 'onSelect'
 > {
-  columns: TableColumn<Row>[];
+  columns: TableColumn<Row>[]
   /** Already fetched and already sorted. The component reads it and nothing more. */
-  rows: Row[];
+  rows: Row[]
   /** A stable identity per row. Selection and React keys both depend on it. */
-  rowKey: (row: Row) => TableRowKey;
+  rowKey: (row: Row) => TableRowKey
   /**
    * Names the table for assistive technology, in both layouts. Rendered as a
    * visually hidden caption on the table and as the label of the card list.
    */
-  caption?: string;
+  caption?: string
   /** `auto` follows the pointer; the other two pin a layout. Defaults to `auto`. */
-  layout?: TableLayout;
-  size?: TableSize;
+  layout?: TableLayout
+  size?: TableSize
   /** Stripes alternate rows. */
-  zebra?: boolean;
+  zebra?: boolean
   /** Keeps the header in view while the table's container scrolls. */
-  pinHeader?: boolean;
+  pinHeader?: boolean
 
   /** Draws skeleton rows in place of data and marks the region busy. */
-  loading?: boolean;
+  loading?: boolean
   /** How many skeleton rows `loading` draws. Defaults to 5. */
-  loadingRows?: number;
+  loadingRows?: number
   /** Replaces the rows with an error alert. A node so the message can carry a link. */
-  error?: ReactNode;
+  error?: ReactNode
   /** Adds a "Try again" button to the error alert. */
-  onRetry?: () => void;
+  onRetry?: () => void
   /** Replaces the default nothing-here panel when `rows` is empty. */
-  empty?: ReactNode;
+  empty?: ReactNode
 
   /**
    * Makes each row activatable. The title cell becomes a real button in both
    * layouts, so keyboard and screen reader users get the same action pointer
    * users get from clicking anywhere on the row.
    */
-  onRowClick?: (row: Row) => void;
+  onRowClick?: (row: Row) => void
 
   /** Draws a checkbox per row and a select-all in the header. */
-  selectable?: boolean;
+  selectable?: boolean
   /** Keys of the selected rows. Controlled; the component holds no selection. */
-  selected?: readonly TableRowKey[];
+  selected?: readonly TableRowKey[]
   /** Called with the full next selection. */
-  onSelectionChange?: (selected: TableRowKey[]) => void;
+  onSelectionChange?: (selected: TableRowKey[]) => void
   /**
    * Names a row's checkbox. Defaults to the title column's text when it is a
    * string or number, otherwise to the row's position.
    */
-  rowLabel?: (row: Row) => string;
+  rowLabel?: (row: Row) => string
 
   /** The current sort, drawn as an indicator on the matching heading. */
-  sort?: TableSort;
+  sort?: TableSort
   /** Called with the sort the user asked for. Sorting the rows is the caller's job. */
-  onSortChange?: (sort: TableSort) => void;
+  onSortChange?: (sort: TableSort) => void
 }
 
-const DEFAULT_LOADING_ROWS = 5;
+const DEFAULT_LOADING_ROWS = 5
 
 const cellAlign: Record<TableColumnAlign, string> = {
-  start: "text-start",
-  end: "text-end",
-};
+  start: 'text-start',
+  end: 'text-end',
+}
 
 /** A raw `row[key]` read, so a plain text column needs no `cell` lambda. */
 const readCell = <Row,>(row: Row, column: TableColumn<Row>): ReactNode => {
-  if (column.cell) return column.cell(row);
-  const value = (row as Record<string, unknown>)[column.key];
-  return value === null || value === undefined ? null : String(value);
-};
+  if (column.cell) return column.cell(row)
+  const value = (row as Record<string, unknown>)[column.key]
+  return value === null || value === undefined ? null : String(value)
+}
 
 /** Where the first sort click goes, and how a repeat click flips it. */
-const nextSort = (
-  column: string,
-  current: TableSort | undefined,
-): TableSort => ({
+const nextSort = (column: string, current: TableSort | undefined): TableSort => ({
   key: column,
-  direction:
-    current?.key === column && current.direction === "asc" ? "desc" : "asc",
-});
+  direction: current?.key === column && current.direction === 'asc' ? 'desc' : 'asc',
+})
 
 const ariaSort = (
   column: TableColumn<unknown>,
   sort: TableSort | undefined,
-): "ascending" | "descending" | "none" | undefined => {
-  if (!column.sortable) return undefined;
-  if (sort?.key !== column.key) return "none";
-  return sort.direction === "asc" ? "ascending" : "descending";
-};
+): 'ascending' | 'descending' | 'none' | undefined => {
+  if (!column.sortable) return undefined
+  if (sort?.key !== column.key) return 'none'
+  return sort.direction === 'asc' ? 'ascending' : 'descending'
+}
 
 const sortIcon = (column: TableColumn<unknown>, sort: TableSort | undefined) =>
-  sort?.key === column.key
-    ? sort.direction === "asc"
-      ? "chevron-up"
-      : "chevron-down"
-    : "sort";
+  sort?.key === column.key ? (sort.direction === 'asc' ? 'chevron-up' : 'chevron-down') : 'sort'
 
 /** Which column heads a card: the one that asked, else the first. */
 const titleColumnOf = <Row,>(columns: TableColumn<Row>[]) =>
-  columns.find((column) => column.card === "title") ?? columns[0];
+  columns.find((column) => column.card === 'title') ?? columns[0]
 
 /**
  * The select-all box is indeterminate while some but not all rows are
@@ -181,15 +173,15 @@ function SelectAll({
   total,
   onChange,
 }: {
-  count: number;
-  total: number;
-  onChange: (all: boolean) => void;
+  count: number
+  total: number
+  onChange: (all: boolean) => void
 }) {
-  const ref = useRef<HTMLInputElement>(null);
-  const some = count > 0 && count < total;
+  const ref = useRef<HTMLInputElement>(null)
+  const some = count > 0 && count < total
   useEffect(() => {
-    if (ref.current) ref.current.indeterminate = some;
-  }, [some]);
+    if (ref.current) ref.current.indeterminate = some
+  }, [some])
   return (
     <input
       ref={ref}
@@ -200,7 +192,7 @@ function SelectAll({
       disabled={total === 0}
       onChange={(event) => onChange(event.target.checked)}
     />
-  );
+  )
 }
 
 /**
@@ -223,8 +215,8 @@ export function Table<Row>({
   rows,
   rowKey,
   caption,
-  layout = "auto",
-  size = "md",
+  layout = 'auto',
+  size = 'md',
   zebra = false,
   pinHeader = false,
   loading = false,
@@ -242,29 +234,28 @@ export function Table<Row>({
   className,
   ...props
 }: TableProps<Row>) {
-  const coarse = useCoarsePointer();
-  const cards = layout === "cards" || (layout === "auto" && coarse);
-  const titleColumn = titleColumnOf(columns);
-  const selectedSet = new Set<TableRowKey>(selected);
-  const clickable = onRowClick !== undefined;
+  const coarse = useCoarsePointer()
+  const cards = layout === 'cards' || (layout === 'auto' && coarse)
+  const titleColumn = titleColumnOf(columns)
+  const selectedSet = new Set<TableRowKey>(selected)
+  const clickable = onRowClick !== undefined
 
   const labelFor = (row: Row, index: number) => {
-    if (rowLabel) return rowLabel(row);
-    const title = readCell(row, titleColumn);
-    return typeof title === "string" || typeof title === "number"
+    if (rowLabel) return rowLabel(row)
+    const title = readCell(row, titleColumn)
+    return typeof title === 'string' || typeof title === 'number'
       ? String(title)
-      : `Row ${index + 1}`;
-  };
+      : `Row ${index + 1}`
+  }
 
   const toggle = (key: TableRowKey, on: boolean) => {
-    const next = new Set(selectedSet);
-    if (on) next.add(key);
-    else next.delete(key);
-    onSelectionChange?.([...next]);
-  };
+    const next = new Set(selectedSet)
+    if (on) next.add(key)
+    else next.delete(key)
+    onSelectionChange?.([...next])
+  }
 
-  const toggleAll = (on: boolean) =>
-    onSelectionChange?.(on ? rows.map(rowKey) : []);
+  const toggleAll = (on: boolean) => onSelectionChange?.(on ? rows.map(rowKey) : [])
 
   /**
    * A click anywhere on a row or card activates it, for pointer users. The
@@ -273,15 +264,15 @@ export function Table<Row>({
    * activation, so it stops the row handler too.
    */
   const rowClick = (row: Row) => (event: MouseEvent) => {
-    if (!onRowClick) return;
-    const target = event.target as HTMLElement;
-    if (target.closest("button, a, input, select, textarea, label")) return;
-    onRowClick(row);
-  };
+    if (!onRowClick) return
+    const target = event.target as HTMLElement
+    if (target.closest('button, a, input, select, textarea, label')) return
+    onRowClick(row)
+  }
 
   const titleCell = (row: Row) => {
-    const content = readCell(row, titleColumn);
-    if (!onRowClick) return content;
+    const content = readCell(row, titleColumn)
+    if (!onRowClick) return content
     return (
       <button
         type="button"
@@ -290,19 +281,19 @@ export function Table<Row>({
       >
         {content}
       </button>
-    );
-  };
+    )
+  }
 
   const status = loading
-    ? "loading"
+    ? 'loading'
     : error !== undefined
-      ? "error"
+      ? 'error'
       : rows.length === 0
-        ? "empty"
-        : "rows";
+        ? 'empty'
+        : 'rows'
 
   const errorPanel =
-    status === "error" ? (
+    status === 'error' ? (
       <Alert
         variant="danger"
         title="Could not load"
@@ -316,24 +307,18 @@ export function Table<Row>({
       >
         {error}
       </Alert>
-    ) : null;
+    ) : null
 
-  const emptyPanel =
-    status === "empty"
-      ? (empty ?? <EmptyState title="Nothing to show" />)
-      : null;
+  const emptyPanel = status === 'empty' ? (empty ?? <EmptyState title="Nothing to show" />) : null
 
-  const skeletonRows = Array.from(
-    { length: Math.max(1, loadingRows) },
-    (_, index) => index,
-  );
+  const skeletonRows = Array.from({ length: Math.max(1, loadingRows) }, (_, index) => index)
 
-  const rootProps = { className, "aria-busy": loading || undefined, ...props };
+  const rootProps = { className, 'aria-busy': loading || undefined, ...props }
 
   if (cards) {
     return (
       <div {...rootProps}>
-        {status === "loading" ? (
+        {status === 'loading' ? (
           <ul className="flex flex-col gap-3" aria-label={caption}>
             {skeletonRows.map((index) => (
               <li key={index}>
@@ -343,34 +328,30 @@ export function Table<Row>({
               </li>
             ))}
           </ul>
-        ) : status !== "rows" ? (
+        ) : status !== 'rows' ? (
           (errorPanel ?? emptyPanel)
         ) : (
           <ul className="flex flex-col gap-3" aria-label={caption}>
             {rows.map((row, index) => {
-              const key = rowKey(row);
+              const key = rowKey(row)
               const bodyColumns = columns.filter(
-                (column) => column !== titleColumn && column.card !== "hidden",
-              );
+                (column) => column !== titleColumn && column.card !== 'hidden',
+              )
               return (
                 <li key={key}>
                   <Card
-                    variant={clickable ? "interactive" : "bordered"}
+                    variant={clickable ? 'interactive' : 'bordered'}
                     onClick={rowClick(row)}
                     header={
                       <>
-                        <span className="min-w-0 flex-1 truncate">
-                          {titleCell(row)}
-                        </span>
+                        <span className="min-w-0 flex-1 truncate">{titleCell(row)}</span>
                         {selectable ? (
                           <input
                             type="checkbox"
                             className="checkbox checkbox-sm"
                             aria-label={labelFor(row, index)}
                             checked={selectedSet.has(key)}
-                            onChange={(event) =>
-                              toggle(key, event.target.checked)
-                            }
+                            onChange={(event) => toggle(key, event.target.checked)}
                           />
                         ) : null}
                       </>
@@ -381,7 +362,7 @@ export function Table<Row>({
                         {bodyColumns.map((column) => (
                           <div key={column.key} className="contents">
                             <dt className="text-muted">{column.header}</dt>
-                            <dd className={cellAlign[column.align ?? "start"]}>
+                            <dd className={cellAlign[column.align ?? 'start']}>
                               {readCell(row, column)}
                             </dd>
                           </div>
@@ -390,15 +371,15 @@ export function Table<Row>({
                     ) : null}
                   </Card>
                 </li>
-              );
+              )
             })}
           </ul>
         )}
       </div>
-    );
+    )
   }
 
-  const columnCount = columns.length + (selectable ? 1 : 0);
+  const columnCount = columns.length + (selectable ? 1 : 0)
 
   return (
     <div {...rootProps}>
@@ -409,11 +390,7 @@ export function Table<Row>({
             <tr>
               {selectable ? (
                 <th scope="col" className="w-0">
-                  <SelectAll
-                    count={selectedSet.size}
-                    total={rows.length}
-                    onChange={toggleAll}
-                  />
+                  <SelectAll count={selectedSet.size} total={rows.length} onChange={toggleAll} />
                 </th>
               ) : null}
               {columns.map((column) => (
@@ -421,7 +398,7 @@ export function Table<Row>({
                   key={column.key}
                   scope="col"
                   aria-sort={ariaSort(column as TableColumn<unknown>, sort)}
-                  className={cellAlign[column.align ?? "start"]}
+                  className={cellAlign[column.align ?? 'start']}
                 >
                   {column.sortable ? (
                     <button
@@ -433,7 +410,7 @@ export function Table<Row>({
                       <Icon
                         name={sortIcon(column as TableColumn<unknown>, sort)}
                         size="xs"
-                        className={sort?.key === column.key ? "" : "opacity-50"}
+                        className={sort?.key === column.key ? '' : 'opacity-50'}
                       />
                     </button>
                   ) : (
@@ -444,7 +421,7 @@ export function Table<Row>({
             </tr>
           </thead>
           <tbody>
-            {status === "loading" ? (
+            {status === 'loading' ? (
               skeletonRows.map((index) => (
                 <tr key={index}>
                   {selectable ? <td /> : null}
@@ -455,7 +432,7 @@ export function Table<Row>({
                   ))}
                 </tr>
               ))
-            ) : status !== "rows" ? (
+            ) : status !== 'rows' ? (
               <tr>
                 <td colSpan={columnCount} className="p-0">
                   {errorPanel ?? emptyPanel}
@@ -463,17 +440,13 @@ export function Table<Row>({
               </tr>
             ) : (
               rows.map((row, index) => {
-                const key = rowKey(row);
+                const key = rowKey(row)
                 return (
                   <tr
                     key={key}
                     onClick={rowClick(row)}
-                    aria-selected={
-                      selectable ? selectedSet.has(key) : undefined
-                    }
-                    className={
-                      clickable ? "cursor-pointer hover:bg-base-200" : undefined
-                    }
+                    aria-selected={selectable ? selectedSet.has(key) : undefined}
+                    className={clickable ? 'cursor-pointer hover:bg-base-200' : undefined}
                   >
                     {selectable ? (
                       <td>
@@ -482,31 +455,24 @@ export function Table<Row>({
                           className="checkbox checkbox-sm"
                           aria-label={labelFor(row, index)}
                           checked={selectedSet.has(key)}
-                          onChange={(event) =>
-                            toggle(key, event.target.checked)
-                          }
+                          onChange={(event) => toggle(key, event.target.checked)}
                         />
                       </td>
                     ) : null}
                     {columns.map((column) => (
-                      <td
-                        key={column.key}
-                        className={cellAlign[column.align ?? "start"]}
-                      >
-                        {column === titleColumn
-                          ? titleCell(row)
-                          : readCell(row, column)}
+                      <td key={column.key} className={cellAlign[column.align ?? 'start']}>
+                        {column === titleColumn ? titleCell(row) : readCell(row, column)}
                       </td>
                     ))}
                   </tr>
-                );
+                )
               })
             )}
           </tbody>
         </table>
       </div>
     </div>
-  );
+  )
 }
 
 /**
@@ -517,15 +483,15 @@ export function Table<Row>({
  * indicator classes are rendered and checked too.
  */
 Table.sampleProps = {
-  caption: "Rooms",
+  caption: 'Rooms',
   columns: [
-    { key: "name", header: "Room", sortable: true },
-    { key: "seats", header: "Seats", align: "end" },
+    { key: 'name', header: 'Room', sortable: true },
+    { key: 'seats', header: 'Seats', align: 'end' },
   ],
   rows: [
-    { name: "Reception", seats: 4 },
-    { name: "Boardroom", seats: 12 },
+    { name: 'Reception', seats: 4 },
+    { name: 'Boardroom', seats: 12 },
   ],
   rowKey: (row: { name: string }) => row.name,
   selectable: true,
-} satisfies TableProps<{ name: string; seats: number }>;
+} satisfies TableProps<{ name: string; seats: number }>

@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from 'react'
 
 /**
  * The query the story names, and deliberately not a viewport width: a touch
@@ -6,21 +6,21 @@ import { useSyncExternalStore } from "react";
  * dragged narrow still has a mouse. `pointer` describes the input, which is
  * what decides whether a row of small cells can be read and hit.
  */
-export const COARSE_POINTER_QUERY = "(pointer: coarse)";
+export const COARSE_POINTER_QUERY = '(pointer: coarse)'
 
 const query = () =>
-  typeof window !== "undefined" && typeof window.matchMedia === "function"
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
     ? window.matchMedia(COARSE_POINTER_QUERY)
-    : null;
+    : null
 
 const subscribe = (onChange: () => void) => {
-  const list = query();
-  if (list === null) return () => {};
-  list.addEventListener("change", onChange);
-  return () => list.removeEventListener("change", onChange);
-};
+  const list = query()
+  if (list === null) return () => {}
+  list.addEventListener('change', onChange)
+  return () => list.removeEventListener('change', onChange)
+}
 
-const getSnapshot = () => query()?.matches ?? false;
+const getSnapshot = () => query()?.matches ?? false
 
 /**
  * On the server there is no pointer to ask about. The table layout is the
@@ -29,7 +29,7 @@ const getSnapshot = () => query()?.matches ?? false;
  * without a layout flash that matters, since a coarse-pointer device is the
  * one repainting.
  */
-const getServerSnapshot = () => false;
+const getServerSnapshot = () => false
 
 /**
  * Whether the primary pointer is coarse, kept live: docking a tablet to a
@@ -37,5 +37,5 @@ const getServerSnapshot = () => false;
  * Environments with no `matchMedia` (jsdom, SSR) report a fine pointer.
  */
 export function useCoarsePointer(): boolean {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }
