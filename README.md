@@ -959,6 +959,10 @@ CI builds every story, so a broken story fails the PR.
 
 ## Contributing
 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the folder layout, the checklist for adding a
+component, token conventions and what a pull request needs. The rules below are the ones
+that break silently when missed.
+
 Every runtime import must be declared in `dependencies` or `peerDependencies`. `react` and
 `react-dom` are peers, never direct dependencies.
 
