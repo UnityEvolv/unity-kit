@@ -2,6 +2,12 @@
 import tailwindcss from '@tailwindcss/vite'
 
 const config: StorybookConfig = {
+  // Without this the browser tab reads 'storybook - Storybook', after the config
+  // directory rather than the library. Storybook renders it into the manager's
+  // <title> at build time, which a manager-head.html cannot override: the template
+  // injects custom head markup after the title element, and the first one wins.
+  title: 'unitykit',
+
   stories: ['../src/**/*.stories.@(ts|tsx)'],
   addons: ['@storybook/addon-themes', '@storybook/addon-docs'],
   framework: { name: '@storybook/react-vite', options: {} },
