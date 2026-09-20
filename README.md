@@ -428,6 +428,69 @@ top. Since a dependency is satisfying one of the kit's accessibility promises, t
 read daisyUI's own CSS and assert it still does, so an upgrade that dropped it fails the
 build instead of quietly shipping a strobe.
 
+## Tables
+
+`Table` renders tabular data from one column definition, as rows for a mouse and as a
+list of cards for a finger. It fetches nothing and sorts nothing: rows arrive already
+sorted, and a click on a sortable heading only reports what the user asked for.
+
+```tsx
+import { Table } from '@unityevolv/unitykit'
+import type { TableColumn } from '@unityevolv/unitykit'
+
+const columns: TableColumn<Room>[] = [
+  { key: 'name', header: 'Room', sortable: true, card: 'title' },
+  { key: 'floor', header: 'Floor' },
+  { key: 'seats', header: 'Seats', align: 'end', sortable: true },
+  { key: 'status', header: 'Status', cell: (r) => <Badge>{r.status}</Badge>, card: 'hidden' },
+]
+
+<Table
+  caption="Rooms"
+  columns={columns}
+  rows={rooms}                       // already sorted
+  rowKey={(r) => r.id}
+  sort={sort}
+  onSortChange={setSort}             // you re-order rows; the table draws the arrow
+  selectable
+  selected={selected}
+  onSelectionChange={setSelected}
+  onRowClick={(r) => open(r.id)}
+  loading={query.isPending}
+  error={query.error?.message}
+  onRetry={query.refetch}
+  zebra
+  pinHeader
+/>
+```
+
+### Cards come from the pointer, not the viewport
+
+`layout="auto"` (the default) watches `(pointer: coarse)`. A touch device gets cards at
+any window size; a desktop window dragged narrow keeps its rows, because a mouse can
+still hit a small cell and a horizontal scrollbar is fine. `layout="table"` or
+`layout="cards"` pins it. Only the active layout is in the DOM, so a screen reader never
+meets two copies of the data.
+
+The same columns drive both. On a card the `card` hint says what each column becomes:
+`title` is the heading, `body` (the default) a labelled line, `hidden` left out. When no
+column claims `title`, the first one is the heading, so a card always has one.
+
+### Loading, empty and error are props
+
+`loading` draws skeleton rows and marks the region `aria-busy`; the skeletons themselves
+are silent, so nothing announces twice. An empty `rows` shows an `EmptyState`, which
+`empty` replaces with your own. `error` swaps the rows for a danger `Alert`, and
+`onRetry` adds a "Try again" button to it. Both layouts show identical states.
+
+### Activation is a real button
+
+With `onRowClick`, a pointer can click anywhere on the row or card, and the title cell
+becomes a `<button>` so the keyboard and a screen reader get the same action. Clicking a
+row's checkbox selects it and does not activate it.
+
+Pagination is deliberately not here; it lands as its own component.
+
 ## Local development
 
 ```bash

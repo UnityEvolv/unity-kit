@@ -1,4 +1,5 @@
 import {
+  ArrowUpDown,
   Bell,
   Calendar,
   Check,
@@ -115,6 +116,7 @@ export const iconComponents = {
   // Metric direction, for a Stat delta. Named for the job rather than the
   // drawing: `trend-flat` is Lucide’s Minus, which reads as "no change" beside
   // a number rather than as a subtraction.
+  sort: ArrowUpDown,
   'trend-up': TrendingUp,
   'trend-down': TrendingDown,
   'trend-flat': Minus,
