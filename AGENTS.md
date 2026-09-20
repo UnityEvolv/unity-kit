@@ -233,6 +233,29 @@ alert.
   a region's content and may need a heading, an alert is a notice inside a region that
   already has one. Adding a prop nobody needs is worse than the inconsistency.
 
+## Toasts
+
+`Toaster` wraps sonner with `unstyled: true` and dresses each toast through sonner's
+`classNames` as a daisyUI `alert`; `toast` wraps sonner's function so the kit owns the
+API surface and the option names.
+
+- **Do not use daisyUI's `.toast` shell.** It positions with `position: fixed`, and so does
+  sonner; two things placing the same list fight. sonner positions, daisyUI styles the
+  message. `theme.css` carries `@import "sonner/dist/styles.css"` because sonner 2 ships
+  its layout CSS as a file rather than injecting it, and a consumer should not have to
+  know that.
+- **`theme` is pinned to `light`.** sonner's theme only drives its stock look, which is
+  off; leaving it on `system` makes sonner read `prefers-color-scheme` on its own, out of
+  step with `data-theme`.
+- **The close button is `order-last`.** sonner renders it first in the DOM and places it
+  absolutely in styled mode; unstyled, the grid would put it in the first column.
+- **Icons come from the kit's table**, the same glyphs `Alert` uses per variant, so an
+  event reported both ways shows one picture. `loading` uses `spinnerClass`, not the
+  `Spinner` component, because the toast is already a live region.
+- **`toast.success/error/warning/info` are the names**, per the story and every toast
+  library; they are functions, not a `variant` prop, so `Alert`'s `ok/warn/danger` does
+  not apply.
+
 ## Form primitives
 
 Every control renders through `Field`. Nothing in the kit draws its own label.

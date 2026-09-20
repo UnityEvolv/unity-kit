@@ -8,6 +8,9 @@ export type { BadgeProps, BadgeVariant, BadgeSize } from './components/Badge'
 export { Alert } from './components/Alert'
 export type { AlertProps, AlertVariant } from './components/Alert'
 
+export { Toaster, toast } from './components/Toast'
+export type { ToasterProps, ToastPosition, ToastOptions, ToastAction, ToastId } from './components/Toast'
+
 export { Card } from './components/Card'
 export type { CardProps, CardVariant, CardMediaPosition } from './components/Card'
 

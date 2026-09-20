@@ -160,6 +160,14 @@ const themeCss = `${BANNER('scripts/tokens.source.mjs')}
  *   @source "../node_modules/@unityevolv/unitykit/dist";
  */
 
+/*
+ * sonner (the Toast engine) ships its layout stylesheet as a file rather than
+ * injecting it. Importing it here means a consumer that mounts <Toaster /> has
+ * nothing extra to add. It is layout only: the kit styles each toast as an
+ * alert, so this costs no look of its own.
+ */
+@import "sonner/dist/styles.css";
+
 /* themes: false because the two below replace daisyUI's built-ins entirely. */
 @plugin "daisyui" {
   themes: false;
