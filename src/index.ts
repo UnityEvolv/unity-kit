@@ -62,6 +62,18 @@ export type { ProgressProps, ProgressVariant } from './components/Progress'
 export { EmptyState } from './components/EmptyState'
 export type { EmptyStateProps, EmptyStateTitleAs } from './components/EmptyState'
 
+export { AppShell, Navbar, Sidebar, useAppShell } from './components/AppShell'
+export type { AppShellProps, NavbarProps, SidebarProps, SidebarItem, AppShellState } from './components/AppShell'
+
+export { Tabs } from './components/Tabs'
+export type { TabsProps, TabItem, TabsVariant, TabsSize } from './components/Tabs'
+
+export { Breadcrumbs } from './components/Breadcrumbs'
+export type { BreadcrumbsProps, BreadcrumbItem, RenderLink } from './components/Breadcrumbs'
+
+export { Accordion } from './components/Accordion'
+export type { AccordionProps, AccordionItem, AccordionVariant } from './components/Accordion'
+
 export { Modal } from './components/Modal'
 export type { ModalProps, ModalSize, ModalCloseProps } from './components/Modal'
 

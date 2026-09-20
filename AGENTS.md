@@ -416,6 +416,29 @@ reasons that have nothing to do with the overlay. Those stubs report no geometry
 purpose: assert behaviour and markup, never where a panel landed on screen.
 
 
+## App shell and navigation
+
+`AppShell`, `Navbar`, `Sidebar`, `Tabs`, `Breadcrumbs` and `Accordion`. The rules that keep
+the package router-agnostic and the daisyUI classes honest:
+
+- **Never import a router.** Active state comes in as `activeKey`; links go out through
+  `renderLink({ href, children, className })`, whose default is a plain `<a>`. That pair
+  is the whole contract, and it is shared by `Sidebar` and `Breadcrumbs`.
+- **`aria-current="page"` is the active state, and daisyUI reads it.** `.menu` styles
+  `[aria-current]` as active and `.tab` styles `[aria-selected=true]`, so neither
+  component toggles `menu-active` or `tab-active` — the attribute Radix or the kit sets is
+  the single source of truth. In `Sidebar` the attribute sits on a `contents` span around
+  the rendered link, because a custom link may not forward unknown props.
+- **`collapse-open` is applied through a data variant.** daisyUI's `collapse` reads open
+  from a checked input, focus, `[open]` or the `collapse-open` class; Radix keeps it on
+  `data-state`. `data-[state=open]:collapse-open` bridges them with no JS. The trigger is a
+  real `<button>` inside a heading whose level is a prop.
+- **The `Navbar` finds the shell through context** (`useAppShell`), so it draws its menu
+  button only when there is a sidebar to open, and the same component serves a sign-in
+  page. The sidebar element is rendered in the column or the drawer, never both.
+- **`.navbar` and `.menu` set no surface.** Both components add `bg-base-100`, as `Card`
+  and `Stat` do, or they sit invisible on the page background.
+
 ## Tables
 
 `Table` is a generic component over one column definition and renders either a daisyUI

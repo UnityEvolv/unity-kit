@@ -552,6 +552,50 @@ top. Since a dependency is satisfying one of the kit's accessibility promises, t
 read daisyUI's own CSS and assert it still does, so an upgrade that dropped it fails the
 build instead of quietly shipping a strobe.
 
+## App shell and navigation
+
+`AppShell` is the frame every consuming app hangs its screens in: a `Navbar` across the
+top, a `Sidebar` beside the content above `lg`, and the same sidebar as a drawer below it.
+`Tabs`, `Breadcrumbs` and `Accordion` are the pieces that go inside.
+
+```tsx
+import { AppShell, Navbar, Sidebar, Breadcrumbs, Tabs, Accordion } from '@unityevolv/unitykit'
+
+<AppShell
+  navbar={<Navbar brand={<Brand product="unityofis" size="sm" />} actions={<UserMenu />} />}
+  sidebar={
+    <Sidebar
+      items={[
+        { key: 'home', label: 'Home', icon: 'office', href: '/' },
+        { key: 'rooms', label: 'Rooms', icon: 'reception', href: '/rooms', badge: <Badge>3</Badge> },
+        { key: 'admin', label: 'Admin', children: [{ key: 'people', label: 'People', href: '/admin' }] },
+      ]}
+      activeKey={routeKey}                       // you say which is current
+      renderLink={({ href, children, className }) => <Link to={href} className={className}>{children}</Link>}
+    />
+  }
+>
+  <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Rooms' }]} renderLink={...} />
+  <Tabs items={[{ value: 'people', label: 'People', content: <People /> }, ...]} />
+  <Accordion type="multiple" items={[{ value: 'audio', title: 'Audio', content: <Audio /> }]} />
+</AppShell>
+```
+
+- **Router-agnostic, by two props.** `activeKey` says which item is current; the kit only
+  draws it. `renderLink` says what a link is; the default is a plain anchor, and a router's
+  `Link` drops in. The package imports no router.
+- **The active item is `aria-current="page"`**, which daisyUI's `menu` already styles as
+  active — the attribute a screen reader needs and the highlight a sighted user sees are
+  one thing.
+- **The sidebar is rendered in one place at a time.** A column above `lg`, a `Drawer` below
+  it, opened by the menu button the `Navbar` grows when it finds a shell with a sidebar
+  around it. Outside a shell the navbar is just a bar.
+- **`Tabs` and `Accordion` are Radix underneath**: arrow keys, Home/End, `aria-controls`
+  and `aria-expanded` are theirs; daisyUI's `tabs` and `collapse` are the look. Tabs are
+  for views in one place, not for navigation between pages.
+- **`Accordion` takes a `headingLevel`** (default `h3`) because a section title's level
+  depends on the page, and `type="multiple"` for a settings page where several stay open.
+
 ## Tables
 
 `Table` renders tabular data from one column definition, as rows for a mouse and as a
