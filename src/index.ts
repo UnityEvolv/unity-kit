@@ -68,6 +68,9 @@ export type { ModalProps, ModalSize, ModalCloseProps } from './components/Modal'
 export { Drawer } from './components/Drawer'
 export type { DrawerProps, DrawerSide, DrawerSize, DrawerCloseProps } from './components/Drawer'
 
+export { Pagination, pageWindow } from './components/Pagination'
+export type { PaginationProps, PaginationSize, PageWindowItem } from './components/Pagination'
+
 export { Table } from './components/Table'
 export type {
   TableProps,
