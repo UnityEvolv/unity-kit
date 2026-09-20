@@ -14,6 +14,7 @@ import {
   Download,
   Ellipsis,
   ExternalLink,
+  File,
   Grid3x3,
   Info,
   Lock,
@@ -112,6 +113,7 @@ export const iconComponents = {
   upload: Upload,
   copy: Copy,
   'external-link': ExternalLink,
+  file: File,
 
   // Metric direction, for a Stat delta. Named for the job rather than the
   // drawing: `trend-flat` is Lucide’s Minus, which reads as "no change" beside

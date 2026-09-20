@@ -44,6 +44,9 @@ export type { RadioProps } from './components/Radio'
 export { Toggle } from './components/Toggle'
 export type { ToggleProps } from './components/Toggle'
 
+export { Dropzone, fileKey, formatBytes } from './components/Dropzone'
+export type { DropzoneProps, DropzoneRejection, DropzoneRejectionReason } from './components/Dropzone'
+
 export { Brand, UEMark, UOMark } from './components/Brand'
 export type { BrandProps, BrandProduct, BrandSize, MarkProps } from './components/Brand'
 
