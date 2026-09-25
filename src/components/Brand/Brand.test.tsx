@@ -18,7 +18,7 @@ describe('Brand', () => {
    */
   it.each([
     ['unityevolv', 'UnityEvolv'],
-    ['unityofis', 'unityofis'],
+    ['unityofis', 'UnityOfis'],
     ['ofiskit', 'ofiskit'],
   ] as const)('writes %s with no space between the words', (product, expected) => {
     const { container } = render(<Brand product={product} />)
@@ -30,8 +30,8 @@ describe('Brand', () => {
     // Scoped to the wordmark: the mark uses the same two tones, on purpose, so
     // an unscoped selector finds the monogram's empty <g> first.
     const wordmark = container.querySelector('span[aria-hidden="true"]')
-    expect(wordmark?.querySelector('.text-secondary')?.textContent).toBe('unity')
-    expect(wordmark?.querySelector('.text-primary')?.textContent).toBe('ofis')
+    expect(wordmark?.querySelector('.text-secondary')?.textContent).toBe('Unity')
+    expect(wordmark?.querySelector('.text-primary')?.textContent).toBe('Ofis')
   })
 
   it('gives the mark the same two tones as the name', () => {
@@ -80,7 +80,7 @@ describe('Brand', () => {
       'is announced once, as %s',
       (product) => {
         render(<Brand product={product as BrandProduct} />)
-        const expected = { unityevolv: 'UnityEvolv', unityofis: 'unityofis', ofiskit: 'ofiskit' }[
+        const expected = { unityevolv: 'UnityEvolv', unityofis: 'UnityOfis', ofiskit: 'ofiskit' }[
           product
         ]
         expect(screen.getByRole('img', { name: expected })).toBeInTheDocument()
@@ -89,7 +89,7 @@ describe('Brand', () => {
 
     it('becomes a single named link when given an href', () => {
       render(<Brand product="unityofis" href="/" />)
-      const link = screen.getByRole('link', { name: 'unityofis' })
+      const link = screen.getByRole('link', { name: 'UnityOfis' })
       expect(link).toHaveAttribute('href', '/')
       // One link, not a link wrapping separately announced fragments.
       expect(screen.getAllByRole('link')).toHaveLength(1)

@@ -22,7 +22,7 @@ interface ProductBrand {
  */
 const products: Record<BrandProduct, ProductBrand> = {
   unityevolv: { mark: UEMark, first: 'Unity', second: 'Evolv', name: 'UnityEvolv' },
-  unityofis: { mark: UOMark, first: 'unity', second: 'ofis', name: 'unityofis' },
+  unityofis: { mark: UOMark, first: 'Unity', second: 'Ofis', name: 'UnityOfis' },
   ofiskit: { mark: UOMark, first: 'ofis', second: 'kit', name: 'ofiskit' },
 }
 
@@ -56,7 +56,7 @@ export interface BrandProps {
  *
  * The two-tone split is decoration, not information. The link or span carries
  * the whole product name as its accessible name and the pieces are hidden, so
- * a screen reader announces "unityofis" once rather than spelling out two
+ * a screen reader announces "UnityOfis" once rather than spelling out two
  * fragments — and the mark stays silent rather than repeating it.
  *
  * Both tones come from the theme, so light mode gets the deepened shades and
