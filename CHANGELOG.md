@@ -1,5 +1,11 @@
 # @unityevolv/unitykit
 
+## 0.1.1
+
+### Patch Changes
+
+- [#35](https://github.com/UnityEvolv/unity-kit/pull/35) [`984b0b8`](https://github.com/UnityEvolv/unity-kit/commit/984b0b811ef668c9bbb13d33b2047d89023181b9) Thanks [@nvamsiram](https://github.com/nvamsiram)! - Brand: write the unityofis product's name as UnityOfis, in the wordmark and its accessible name, matching UnityEvolv.
+
 ## 0.1.0
 
 ### Minor Changes
